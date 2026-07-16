@@ -7,7 +7,7 @@ are cut from this public repository.
 
 ## Unreleased
 
-## 0.1.0 - 2026-07-17
+## 0.1.0 - 2026-07-16
 
 - Stabilized the v0.1 core entry point by keeping unfinished schema automation private.
 - Added generated Vue declarations while preserving the source-runtime contract, plus package metadata,

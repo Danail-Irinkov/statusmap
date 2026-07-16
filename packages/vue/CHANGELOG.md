@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 0.1.0 - 2026-07-17
+## 0.1.0 - 2026-07-16
 
 - Added generated declarations, package validation, and packed-consumer proof.
 - Improved empty states, filter clarity, mobile layout, contrast, focus, and reduced-motion behavior.
