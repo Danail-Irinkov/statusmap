@@ -1,0 +1,19 @@
+id: search
+label: Full-text search
+areaId: core
+lifecycle: built
+summary: 'Find notes by keyword across the whole workspace.'
+prd:
+  - SEARCH_SPEC
+intents:
+  - id: keyword-search
+    label: Search notes by keyword
+    lifecycle: built
+    note: 'Works, but relevance ranking is only spot-checked, not proven.'
+    coverage:
+      proofLevel: heuristic # weak proof — reads "~ Heuristic" regardless of passing
+      passing: true
+      matrix: search-relevance-matrix
+      lastRun: '2026-06-18'
+gaps:
+  - 'Is fuzzy matching in scope for v1, or exact-token only?'

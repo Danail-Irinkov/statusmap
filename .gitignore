@@ -1,0 +1,16 @@
+node_modules/
+dist/
+demo-dist/
+shots/
+coverage/
+artifacts/
+!examples/self-roadmap/artifacts/
+!examples/self-roadmap/artifacts/**
+.tmp/
+*.tgz
+*.stackdump
+.swarm/
+.env
+.env.*
+!.env.example
+.DS_Store

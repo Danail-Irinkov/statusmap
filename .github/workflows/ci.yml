@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  packages:
+    name: Package checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          # The locked tsdown toolchain requires Node >=22.18; package runtime support remains Node >=18.
+          node-version: 22.18
+          cache: npm
+          cache-dependency-path: |
+            packages/core/package-lock.json
+            packages/vue/package-lock.json
+
+      - name: Install core dependencies
+        run: npm ci
+        working-directory: packages/core
+
+      - name: Build core
+        run: npm run build
+        working-directory: packages/core
+
+      - name: Test core
+        run: npm test
+        working-directory: packages/core
+
+      - name: Typecheck core
+        run: npm run typecheck
+        working-directory: packages/core
+
+      - name: Lint core package
+        run: npm run lint:pkg
+        working-directory: packages/core
+
+      - name: Dry-pack core
+        run: npm run pack:dry
+        working-directory: packages/core
+
+      - name: Audit core runtime dependencies
+        run: npm audit --omit=dev
+        working-directory: packages/core
+
+      - name: Install Vue dependencies
+        run: npm ci
+        working-directory: packages/vue
+
+      - name: Test Vue
+        run: npm test
+        working-directory: packages/vue
+
+      - name: Typecheck Vue
+        run: npm run typecheck
+        working-directory: packages/vue
+
+      - name: Build Vue declarations
+        run: npm run build:types
+        working-directory: packages/vue
+
+      - name: Build Vue bundle
+        run: npm run build:bundle
+        working-directory: packages/vue
+
+      - name: Lint Vue package
+        run: npm run lint:pkg
+        working-directory: packages/vue
+
+      - name: Dry-pack Vue
+        run: npm run pack:dry
+        working-directory: packages/vue
+
+      - name: Audit Vue runtime dependencies
+        run: npm audit --omit=dev
+        working-directory: packages/vue
+
+      - name: Scan the public tree
+        run: node scripts/check-public-leaks.mjs
+
+      - name: Build a fresh consumer from packed packages
+        run: node scripts/verify-packed-consumer.mjs
+
+      - name: Validate self-roadmap example
+        run: node examples/self-roadmap/validate.mjs

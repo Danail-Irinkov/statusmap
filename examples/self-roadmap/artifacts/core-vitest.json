@@ -1,0 +1,744 @@
+{
+	"_meta": {
+		"note": "REAL @statusmap/core test run, captured for the self-roadmap demo. Ground truth — the library ingests this via parseVitestJson + applyCoverageTests to build the failing-first proof trees you see. Slimmed to the fields the parser reads.",
+		"producer": "vitest",
+		"capturedAt": "2026-06-23",
+		"regenerate": "node packages/core/node_modules/vitest/vitest.mjs run --root packages/core --reporter=json --outputFile=<tmp>, then node examples/self-roadmap/artifacts/_regen.mjs"
+	},
+	"numTotalTests": 95,
+	"numPassedTests": 95,
+	"numFailedTests": 0,
+	"testResults": [
+		{
+			"name": "packages/core/tests/coverage-signal.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "a pass raises proof at most to owning_e2e, never fabricates destination",
+					"ancestorTitles": [
+						"applyCoverage — the honesty rules"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "a real fail forces health down (built-but-broken reads red)",
+					"ancestorTitles": [
+						"applyCoverage — the honesty rules"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "never downgrades a hand-authored destination on a machine pass",
+					"ancestorTitles": [
+						"applyCoverage — the honesty rules"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "honours producer precedence — the higher-ranked verdict wins for one target",
+					"ancestorTitles": [
+						"applyCoverage — the honesty rules"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "unknown / blocked verdicts keep the hand snapshot",
+					"ancestorTitles": [
+						"applyCoverage — the honesty rules"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/coverage-tests-ingest.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "parses assertions into results with suite paths",
+					"ancestorTitles": [
+						"parseVitestJson + buildTestTree"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "rolls a suite up to failed when any leaf fails, tallying descendants",
+					"ancestorTitles": [
+						"parseVitestJson + buildTestTree"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "captures spec status + e2e steps, failing a step that has an error",
+					"ancestorTitles": [
+						"parsePlaywrightJson"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "matches by file token and requires every group token in suite/name",
+					"ancestorTitles": [
+						"resultsForIntent — the join key"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "strips dirs + spec/test extensions and lowercases",
+					"ancestorTitles": [
+						"testJoinKey"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "merges vitest + playwright artifacts",
+					"ancestorTitles": [
+						"buildTestResults"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "overlays a run tree onto the intent whose owningE2e matches, leaving others untouched",
+					"ancestorTitles": [
+						"applyCoverageTests overlay"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/create.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "builds a validated bundle from a { path: rawYaml } map (splits areas vs features, skips _ files)",
+					"ancestorTitles": [
+						"createStatusMap"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/example-ledger.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "loads + validates clean",
+					"ancestorTitles": [
+						"example ledger (Acme Notes)"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "skips the _template.yaml authoring aid",
+					"ancestorTitles": [
+						"example ledger (Acme Notes)"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "rolls the whole app up honestly (deferred + planned drag it below half)",
+					"ancestorTitles": [
+						"example ledger (Acme Notes)"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "projects into the three explorer levels",
+					"ancestorTitles": [
+						"example ledger (Acme Notes)"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/filter-store.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "adds a value to an empty group without mutating the input",
+					"ancestorTitles": [
+						"toggleValue — pure, immutable transitions"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "removes a present value and drops an emptied group (canonical form)",
+					"ancestorTitles": [
+						"toggleValue — pure, immutable transitions"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "toggles independently per group",
+					"ancestorTitles": [
+						"toggleValue — pure, immutable transitions"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "does not duplicate when toggling distinct values into a group",
+					"ancestorTitles": [
+						"toggleValue — pure, immutable transitions"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "adds all values when none/some are present",
+					"ancestorTitles": [
+						"toggleGroup — set-wise toggle of a preset"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "removes the whole set when every value is already present",
+					"ancestorTitles": [
+						"toggleGroup — set-wise toggle of a preset"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "adds only the missing values when partially present, without duplicating",
+					"ancestorTitles": [
+						"toggleGroup — set-wise toggle of a preset"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "does not mutate the input",
+					"ancestorTitles": [
+						"toggleGroup — set-wise toggle of a preset"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "sets non-blank text",
+					"ancestorTitles": [
+						"setText — set/clear the free-text dimension"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "blank/whitespace clears it",
+					"ancestorTitles": [
+						"setText — set/clear the free-text dimension"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "does not mutate the input",
+					"ancestorTitles": [
+						"setText — set/clear the free-text dimension"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "returns the inactive (empty) state",
+					"ancestorTitles": [
+						"clearFilter"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "isValueActive reflects membership",
+					"ancestorTitles": [
+						"selectors"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "activeCount sums tones + verdicts + areas + (1 if text)",
+					"ancestorTitles": [
+						"selectors"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "isFilterActive agrees with activeCount > 0",
+					"ancestorTitles": [
+						"selectors"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "writes only non-empty dimensions with the documented keys",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "an inactive state yields no params",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "parses a query string, ignoring unknown keys (view/area/feature co-exist)",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "accepts a plain record and a URLSearchParams alike",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "round-trips {} to an identical state",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "round-trips {\"tones\":[\"red\"]} to an identical state",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "round-trips {\"verdicts\":[\"failing\",\"blocked\"]} to an identical state",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "round-trips {\"areas\":[\"a1\",\"a2\"]} to an identical state",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "round-trips {\"text\":\"free text search\"} to an identical state",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "round-trips {\"tones\":[\"red\",\"blocked\"],\"verdicts\":[\"failing\"],\"areas\":[\"core\"],\"text\":\"note\"} to an identical state",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "round-trips {\"tones\":[\"yellow\",\"red\",\"blocked\",\"stale\",\"planned\",\"unknown\"]} to an identical state",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "round-trips a STRING form too (toString → parse)",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "trims whitespace in list values and the text on parse",
+					"ancestorTitles": [
+						"URL codec — filterToQuery / filterFromQuery"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/filter.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "an empty state is inactive (full map)",
+					"ancestorTitles": [
+						"isFilterActive"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "any non-empty dimension activates",
+					"ancestorTitles": [
+						"isFilterActive"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "is a no-op when no dimension is set",
+					"ancestorTitles": [
+						"filterLedger — empty state returns the full ledger"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "\"Needs attention\" drops the fully-live feature, keeps non-live work",
+					"ancestorTitles": [
+						"filterLedger — tones dimension narrows correctly"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "\"failing\" keeps only features containing a failing intent; intent-less leaf dropped",
+					"ancestorTitles": [
+						"filterLedger — verdicts dimension narrows correctly"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "matches the verdicts intentVerdictCategories assigns",
+					"ancestorTitles": [
+						"filterLedger — verdicts dimension narrows correctly"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "keeps only features in the selected area(s)",
+					"ancestorTitles": [
+						"filterLedger — areas dimension narrows correctly"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "OR-within areas keeps features from any listed area",
+					"ancestorTitles": [
+						"filterLedger — areas dimension narrows correctly"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "matches an intent label (case-insensitive), pruning to the matching intent",
+					"ancestorTitles": [
+						"filterLedger — text dimension matches labels + summaries"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "matches a feature summary even when no single intent matches (keeps all intents)",
+					"ancestorTitles": [
+						"filterLedger — text dimension matches labels + summaries"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "matches a workflow note via the intent haystack",
+					"ancestorTitles": [
+						"filterLedger — text dimension matches labels + summaries"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "matches an intent-less leaf by its own label/summary",
+					"ancestorTitles": [
+						"filterLedger — text dimension matches labels + summaries"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "no match → empty map",
+					"ancestorTitles": [
+						"filterLedger — text dimension matches labels + summaries"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "tones AND verdicts intersect at the intent level",
+					"ancestorTitles": [
+						"filterLedger — AND-across dimensions, OR-within"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "text AND area intersect",
+					"ancestorTitles": [
+						"filterLedger — AND-across dimensions, OR-within"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "area AND verdict intersect (area gates before the leaf verdict)",
+					"ancestorTitles": [
+						"filterLedger — AND-across dimensions, OR-within"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "prunes areas with no surviving features",
+					"ancestorTitles": [
+						"filterLedger — area pruning"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "reports shown vs total features",
+					"ancestorTitles": [
+						"filterSummary"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "the deprecated `statuses` key is honored as the tone axis",
+					"ancestorTitles": [
+						"back-compat (G4) — ReviewFilter / statuses alias + legacy fn names"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "`tones` wins when both `tones` and `statuses` are present",
+					"ancestorTitles": [
+						"back-compat (G4) — ReviewFilter / statuses alias + legacy fn names"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "reviewFilterSummary aliases filterSummary",
+					"ancestorTitles": [
+						"back-compat (G4) — ReviewFilter / statuses alias + legacy fn names"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/generators.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "maps proofLevel + passing to a verdict",
+					"ancestorTitles": [
+						"testedVerdict — the proof-level ladder"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "a heuristic stays weak (yellow) even when passing",
+					"ancestorTitles": [
+						"testedVerdict — the proof-level ladder"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "not_built / planned → Not built",
+					"ancestorTitles": [
+						"blockingFlag"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "health down → Blocked",
+					"ancestorTitles": [
+						"blockingFlag"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "counts workflow blockers",
+					"ancestorTitles": [
+						"blockingFlag"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "a clean intent shows NO flag (absence is the signal)",
+					"ancestorTitles": [
+						"blockingFlag"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "collects down workflows + noted partial workflows",
+					"ancestorTitles": [
+						"intentBlockers"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "derives tested + blocking + blockers + coverage chips onto the card",
+					"ancestorTitles": [
+						"intentToCard"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "omits the brand by default, applies it when given",
+					"ancestorTitles": [
+						"ledgerToOverview branding"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "threads the basePath into drill links",
+					"ancestorTitles": [
+						"ledgerToOverview branding"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/no-private-leak.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "every example YAML is free of source-app-specific identifiers",
+					"ancestorTitles": [
+						"no internal data leaks into the published example"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/review-filter.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "classifies the tested axis",
+					"ancestorTitles": [
+						"intentVerdictCategories"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "adds blocking categories (an intent can be several at once)",
+					"ancestorTitles": [
+						"intentVerdictCategories"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "is a no-op when no filter is active",
+					"ancestorTitles": [
+						"filterLedger"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "status: \"Needs attention\" drops the fully-live feature, keeps non-live work",
+					"ancestorTitles": [
+						"filterLedger"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "verdict: \"failing\" keeps only features containing a failing intent; intent-less leaf dropped",
+					"ancestorTitles": [
+						"filterLedger"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "AND-combines the two axes at the intent level",
+					"ancestorTitles": [
+						"filterLedger"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "prunes areas with no surviving features",
+					"ancestorTitles": [
+						"filterLedger"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "reviewFilterSummary reports shown vs total",
+					"ancestorTitles": [
+						"filterLedger"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/rollup.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "only live is fully up; deferred/planned/not_built/unknown are down",
+					"ancestorTitles": [
+						"honest health math"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "weights up=100, partial=50, down=0",
+					"ancestorTitles": [
+						"honest health math"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "rolls a feature set up to an honest % (deferred + not-built drag it down)",
+					"ancestorTitles": [
+						"honest health math"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "rollupTone thresholds: >=80 green, >=34 yellow, else red; empty neutral",
+					"ancestorTitles": [
+						"honest health math"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "lifecycleTone keeps the build nuance the health axis flattens",
+					"ancestorTitles": [
+						"honest health math"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "intent health averages its workflows",
+					"ancestorTitles": [
+						"honest health math"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "a feature health override wins over lifecycle",
+					"ancestorTitles": [
+						"honest health math"
+					],
+					"status": "passed"
+				}
+			]
+		},
+		{
+			"name": "packages/core/tests/tone.test.ts",
+			"status": "passed",
+			"assertionResults": [
+				{
+					"title": "resolves every tone to a family + four package-namespaced tokens + a label",
+					"ancestorTitles": [
+						"statusTone"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "collapses the health + planning vocab onto the five families",
+					"ancestorTitles": [
+						"statusTone"
+					],
+					"status": "passed"
+				},
+				{
+					"title": "exposes tone vars for inline styles",
+					"ancestorTitles": [
+						"statusTone"
+					],
+					"status": "passed"
+				}
+			]
+		}
+	]
+}

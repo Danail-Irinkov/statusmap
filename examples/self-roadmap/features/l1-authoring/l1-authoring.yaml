@@ -1,0 +1,23 @@
+id: l1-authoring
+label: AI-maintained authoring (cucumber-for-AI)
+areaId: l1-authoring
+lifecycle: planned
+summary: 'Workers maintain the lightweight typed YAML map from a code diff; the honesty validator forbids green without a real artifact. Spec drafted; implementation planned.'
+prd:
+  - CODE_MAINTENANCE_L1_AUTHORING_SPEC
+intents:
+  - id: author-from-diff
+    label: A worker updates the map from a code diff (no human hand-edit)
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: honesty-validator
+    label: statusmap-validate CLI (structural + ID + honesty tiers)
+    lifecycle: planned
+    note: 'Ships in @statusmap/core so every adopter inherits the gate; deterministic, no LLM.'
+    coverage: { proofLevel: none, passing: false }
+  - id: bulk-migrate-ledgers
+    label: Bulk-migrate two consumer ledgers (only after the contract is real)
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+gaps:
+  - 'OD-1 is locked to lightweight YAML (no Gherkin); the L1 spec is revised by Phase S to bind v1.'

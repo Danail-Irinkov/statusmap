@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "statusmap-render-release-proof",
+  "generatedAt": "2026-07-16T03:14:00+03:00",
+  "command": "STATUSMAP_SHOT_DIR=artifacts/final-ux-4/shots npm --prefix packages/vue run proof:demo",
+  "result": "passed",
+  "states": 15,
+  "viewports": [390, 768, 1440],
+  "themes": ["light", "dark"],
+  "interactions": [
+    "overview",
+    "needs-attention filter",
+    "no-match recovery",
+    "feature drill-down",
+    "grouped/list focus",
+    "list view",
+    "reduced motion",
+    "self-roadmap explore"
+  ],
+  "selfRoadmapStates": [
+    "sm-390-light-self-roadmap",
+    "sm-390-dark-self-roadmap"
+  ],
+  "checks": {
+    "axeViolations": 0,
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "horizontalOverflow": 0
+  },
+  "visualInspection": {
+    "completed": true,
+    "states": [
+      "sm-390-light-self-roadmap",
+      "sm-390-dark-self-roadmap",
+      "sm-1440-light-list"
+    ]
+  }
+}

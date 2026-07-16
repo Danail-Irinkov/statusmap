@@ -1,0 +1,6 @@
+/* @statusmap/vue theme — RE-EXPORT only (PRD §6.5 / D-003).
+ * The canonical stylesheet now lives in @statusmap/core (`@statusmap/core/styles.css`); this file forwards to
+ * it so both `import '@statusmap/vue/styles.css'` and the demos keep resolving with ZERO visual change, while
+ * every renderer themes from one source and cannot drift. Override `--statusmap-*` tokens on a parent to re-theme. */
+
+@import '@statusmap/core/styles.css';

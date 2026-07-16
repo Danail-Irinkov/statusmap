@@ -1,0 +1,9 @@
+id: invoices
+label: Invoice history
+areaId: billing
+lifecycle: deferred
+summary: 'Download past invoices as PDFs.'
+prd:
+  - BILLING_SPEC
+gaps:
+  - 'Deferred until subscriptions exit beta — confirm priority.'

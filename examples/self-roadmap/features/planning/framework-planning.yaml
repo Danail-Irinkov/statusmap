@@ -1,0 +1,60 @@
+id: framework-planning
+label: Framework planning & validation
+areaId: planning
+lifecycle: live
+summary: 'The product contract, layer specs, and external validations are represented here as historical planning context; the OSS demo keeps them heuristic unless their source artifacts live in this repo.'
+prd:
+  - AI_CODE_MAINTENANCE_FRAMEWORK_PRD
+intents:
+  - id: prd-contract
+    label: Write the framework PRD + roadmap
+    lifecycle: live
+    note: 'Historical PRD signal. The source PRD is not published in this repo, so the OSS demo keeps this below owning_e2e.'
+    coverage:
+      proofLevel: heuristic
+      passing: true
+      evidenceRef: 'examples/self-roadmap/artifacts/planning-provenance.md'
+      lastRun: '2026-06-23'
+  - id: layer-specs
+    label: Draft the L1/L2/L3 layer specs (parallel agents)
+    lifecycle: live
+    note: 'Historical layer-spec signal. Promote this only after adding the real local spec artifacts.'
+    coverage:
+      proofLevel: heuristic
+      passing: true
+      evidenceRef: 'examples/self-roadmap/artifacts/planning-provenance.md'
+      lastRun: '2026-06-23'
+    workflows:
+      - { id: l1-spec, label: 'L1 authoring + honesty validator', lifecycle: live }
+      - { id: l2-spec, label: 'L2 signal -> red detection', lifecycle: live }
+      - { id: l3-spec, label: 'L3 reproduce -> fix -> green', lifecycle: live }
+  - id: aprd-harden
+    label: Harden the PRD (a-prd pass) + batch the decisions
+    lifecycle: live
+    note: 'Historical a-prd signal. The hardened PRD artifact is not published in this repo, so this is heuristic only.'
+    coverage:
+      proofLevel: heuristic
+      passing: true
+      evidenceRef: 'examples/self-roadmap/artifacts/planning-provenance.md'
+      lastRun: '2026-06-23'
+  - id: athread-approach
+    label: Validate the approach (ChatGPT Pro, port re-sequence)
+    lifecycle: live
+    note: 'Historical external-validation signal. The a-thread transcript is not published in this repo.'
+    coverage:
+      proofLevel: heuristic
+      passing: true
+      evidenceRef: 'examples/self-roadmap/artifacts/planning-provenance.md'
+      lastRun: '2026-06-23'
+  - id: athread-schema
+    label: Validate the L0 schema shape (ChatGPT Pro, follow-up)
+    lifecycle: live
+    note: 'Historical external-validation signal: restructure into 5 typed v1 contracts; the authored<->derived split bans authored proof.'
+    coverage:
+      proofLevel: heuristic
+      passing: true
+      evidenceRef: 'examples/self-roadmap/artifacts/planning-provenance.md'
+      lastRun: '2026-06-23'
+gaps:
+  - 'Founder sign-off on D-001 (L3 autonomy cutover) and D-002 (ApprovalGate scope). D-003 consumption is proven by the packed Vite consumer.'
+  - 'Founder sign-off on the schema-v1 restructure (it supersedes the L1 no-schema-change stance).'

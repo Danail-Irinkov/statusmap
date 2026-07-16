@@ -1,0 +1,23 @@
+id: l2-detection
+label: Signal-driven detection
+areaId: l2-detection
+lifecycle: planned
+summary: 'A Watcher tails CI/error-logs/reports; a cheap Judge attributes each signal to the owning node and flips it red with provenance. Spec drafted; implementation planned.'
+prd:
+  - CODE_MAINTENANCE_L2_DETECTION_SPEC
+intents:
+  - id: watch-signals
+    label: Watch CI runs, runtime errors, and user reports (CP-D Watcher)
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: attribute-and-flip-red
+    label: Attribute a signal to the owning node and flip it red, cited (CP-A Judge)
+    lifecycle: planned
+    note: 'AI attribution over the typed map — never regex. G2: every red is attributable + cited.'
+    coverage: { proofLevel: none, passing: false }
+  - id: generalize-feature-health
+    label: Generalize the Feature Health flip to intent/workflow level, portable
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+gaps:
+  - 'Adapter order CI -> reports -> runtime; shadow -> autonomous on a measured false-attribution rate.'

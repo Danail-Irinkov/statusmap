@@ -1,0 +1,22 @@
+id: l4-framework
+label: Continuous framework + multi-repo
+areaId: l4-framework
+lifecycle: planned
+summary: 'The closed loop runs continuously in CI/night-shift; policy controls + metrics; a second repo onboards via adapters. The north star.'
+prd:
+  - AI_CODE_MAINTENANCE_FRAMEWORK_PRD
+intents:
+  - id: continuous-loop
+    label: Run the detect -> remediate loop continuously within policy
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: second-repo
+    label: Onboard a second repo via adapters, no core change
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: metrics
+    label: Track true-%-green, MTTR-to-green, and false-green rate (target 0)
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+gaps:
+  - 'Portability is proven only when the second repo renders + remediates with zero core edits.'

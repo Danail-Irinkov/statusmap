@@ -1,0 +1,23 @@
+id: subscriptions
+label: Subscriptions
+areaId: billing
+lifecycle: beta
+summary: 'Subscribe to a paid plan and manage the subscription.'
+prd:
+  - BILLING_SPEC
+intents:
+  - id: subscribe
+    label: Subscribe to a plan
+    lifecycle: beta
+    coverage:
+      proofLevel: owning_e2e
+      passing: true
+      owningE2e: billing-subscribe
+      lastRun: '2026-06-15'
+  - id: cancel
+    label: Cancel a subscription
+    lifecycle: built
+    coverage:
+      proofLevel: unit
+      passing: true
+      lastRun: '2026-06-15'

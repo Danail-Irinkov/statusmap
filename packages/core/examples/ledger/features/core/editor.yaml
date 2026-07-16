@@ -1,0 +1,28 @@
+id: editor
+label: Note editor
+areaId: core
+lifecycle: live
+summary: 'Write and format notes with autosave.'
+prd:
+  - EDITOR_SPEC
+intents:
+  - id: write-note
+    label: Write and autosave a note
+    lifecycle: live
+    coverage:
+      proofLevel: destination # a human looked at the saved result — the strongest proof
+      passing: true
+      owningE2e: editor-autosave
+      lastRun: '2026-06-20'
+      evidenceRef: 'ci-run/4821'
+    workflows:
+      - { id: type, label: Type into the editor, lifecycle: live }
+      - { id: autosave, label: Autosave to the server, lifecycle: live }
+  - id: format-note
+    label: Apply rich-text formatting
+    lifecycle: live
+    coverage:
+      proofLevel: owning_e2e
+      passing: true
+      owningE2e: editor-formatting
+      lastRun: '2026-06-20'

@@ -1,0 +1,36 @@
+id: offline-sync
+label: Offline sync
+areaId: sync
+lifecycle: partial
+summary: 'Edit offline and reconcile changes when back online.'
+prd:
+  - SYNC_SPEC
+intents:
+  - id: queue-offline-edits
+    label: Queue edits made while offline
+    lifecycle: built
+    coverage:
+      proofLevel: unit
+      passing: true
+      owningE2e: offline-queue
+      lastRun: '2026-06-17'
+  - id: replay-on-reconnect
+    label: Replay queued edits on reconnect
+    lifecycle: partial
+    health: down # built but broken → reads red, and the failing run confirms it
+    note: 'Replay drops edits when the queue is large.'
+    coverage:
+      proofLevel: owning_e2e
+      passing: false # a real failing run → "✗ Failing"
+      owningE2e: offline-replay
+      lastRun: '2026-06-19'
+      evidenceRef: 'ci-run/4830'
+    workflows:
+      - { id: detect-online, label: Detect reconnect, lifecycle: live }
+      - id: flush-queue
+        label: Flush the edit queue
+        lifecycle: partial
+        health: down
+        note: 'Large queues exceed the request size limit.'
+gaps:
+  - 'What is the maximum offline queue size we commit to supporting?'

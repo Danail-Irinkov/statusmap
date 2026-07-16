@@ -1,0 +1,105 @@
+id: statusmap-library
+label: Status-map library
+areaId: l0-control-plane
+lifecycle: partial
+summary: 'The honest, test-aware map engine (@statusmap/core + @statusmap/vue). It is the most-built layer, so it earns the full proof ladder here — every status below is backed by a real artifact (a vitest run, an npm pack, or this rendered page itself), never a hand-typed checkmark.'
+prd:
+  - AI_CODE_MAINTENANCE_FRAMEWORK_PRD
+  - STATUSMAP_MULTIFRAMEWORK_PRD
+intents:
+  # ── destination proof: the strongest rung — a human-facing render route, reproducibly captured ──────
+  - id: render-honest-map
+    label: Render the honest map (this very page)
+    lifecycle: live
+    note: 'You are looking at it: this roadmap is rendered by the library from this YAML. Destination proof is the evaluator-facing demo route in both themes, exercised by the release render matrix — not a hand-typed claim.'
+    coverage:
+      proofLevel: destination
+      passing: true
+      evidenceRef: 'examples/self-roadmap/artifacts/render-proof.json'
+      lastRun: '2026-07-16'
+  # ── owning_e2e + unit: real vitest trees, ingested from ./artifacts/core-vitest.json ────────────────
+  - id: honest-health-math
+    label: Roll up health honestly (planned/deferred count as down)
+    lifecycle: live
+    note: 'The opinionated core: only `live` is fully up; planned/deferred/not_built drag the parent % down, so the rollup is the true completeness, not a vanity number.'
+    coverage:
+      proofLevel: unit
+      passing: true
+      owningE2e: rollup
+      evidenceRef: 'examples/self-roadmap/artifacts/core-vitest.json'
+      lastRun: '2026-06-23'
+  - id: definition-generators
+    label: Project a ledger into the 5 render views + honest verdicts
+    lifecycle: live
+    note: 'overview → area → feature drill-down, plus the flat and QA-scan projections, and the TESTED/BLOCKING verdicts you see on every row.'
+    coverage:
+      proofLevel: owning_e2e
+      passing: true
+      owningE2e: generators
+      evidenceRef: 'examples/self-roadmap/artifacts/core-vitest.json'
+      lastRun: '2026-06-23'
+  - id: test-tree-ingestion
+    label: Ingest vitest/playwright JSON into a failing-first proof tree
+    lifecycle: live
+    note: 'The headline feature, dog-fooded: the proof trees on THIS page were produced by this code from the real run JSON in ./artifacts/. Machine signals cap at owning_e2e — they can never fabricate the destination rung.'
+    coverage:
+      proofLevel: owning_e2e
+      passing: true
+      owningE2e: coverage-tests-ingest
+      evidenceRef: 'examples/self-roadmap/artifacts/core-vitest.json'
+      lastRun: '2026-06-23'
+  - id: filtering
+    label: Filter the map (needs-attention / by status), shareable by URL
+    lifecycle: live
+    note: 'One framework-neutral filter owned by core: a pure predicate + store + URL codec. The two suites (49 cases) merge into one tree via owningE2e + matrix.'
+    coverage:
+      proofLevel: unit
+      passing: true
+      owningE2e: filter
+      matrix: filter-store
+      evidenceRef: 'examples/self-roadmap/artifacts/core-vitest.json'
+      lastRun: '2026-06-23'
+  # ── built / pre-live: implemented + packed-consumer-proven, not yet published to npm ───────────────
+  - id: vue-consumable
+    label: Make @statusmap/vue a real consumable package
+    lifecycle: built
+    health: partial
+    note: 'The source-runtime package and generated declarations build from real tarballs in a fresh stock Vue 3 + Vite app. Pre-live: npm scope access and the first registry publish remain owner gates.'
+    coverage:
+      proofLevel: owning_e2e
+      passing: true
+      evidenceRef: 'examples/self-roadmap/artifacts/package-proof.json'
+      lastRun: '2026-07-16'
+    workflows:
+      - { id: exports-map, label: 'Source-pointing exports/files/styles', lifecycle: live }
+      - { id: declarations, label: 'Fresh generated TypeScript declarations', lifecycle: live }
+      - { id: packed-vite-build, label: 'Install tarballs and build a stock Vue 3 + Vite consumer', lifecycle: live }
+      - id: registry-publish
+        label: 'Publish and install the public npm versions'
+        lifecycle: planned
+        note: 'Owner gate: confirm @statusmap scope authorization, publish core first, then Vue.'
+  # ── heuristic: a weak signal, honestly capped — never implied green ─────────────────────────────────
+  - id: signal-overlay
+    label: Runtime signal overlay (status derives from a live test feed)
+    lifecycle: partial
+    note: 'A lane-based prototype is unit-tested (it merges a CoverageSignal[] onto the map, a fail forcing red). But as a PORTABLE runtime feed it is unproven — the bindings[] + Signal v1 contract is pending schema-v1 — so its proof stays heuristic, not owning_e2e.'
+    coverage:
+      proofLevel: heuristic
+      passing: true
+      owningE2e: coverage-signal
+      evidenceRef: 'examples/self-roadmap/artifacts/core-vitest.json'
+      lastRun: '2026-06-23'
+  # ── a REAL failing node: a TDD test for an UNBUILT capability — known-failing, non-gating ───────────
+  - id: cypress-adapter
+    label: Ingest Cypress JSON (a third test producer)
+    lifecycle: planned
+    note: 'TDD: the owning test is written first and is currently RED; the adapter itself is not built (the library ingests vitest + playwright today). This is a real, clearly-labeled, non-gating known-failure artifact — not in `npm test`, and never a faked break — so the renderer''s failing-first proof tree (red auto-opens, ✗/○ verdicts) is demonstrated honestly. Drill in via Explore map.'
+    coverage:
+      proofLevel: owning_e2e
+      passing: false
+      owningE2e: cypress-adapter
+      evidenceRef: 'examples/self-roadmap/artifacts/known-failing.cypress-adapter.json'
+      lastRun: '2026-06-23'
+gaps:
+  - 'Public registry: confirm @statusmap npm-scope authorization and verify the first published versions.'
+  - 'Signal overlay: define the portable bindings[] + Signal v1 contract — domain lanes move behind schema-v1 bindings.'

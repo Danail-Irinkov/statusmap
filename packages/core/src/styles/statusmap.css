@@ -1,0 +1,82 @@
+/* Default theme for the status map — shipped from @statusmap/core so every renderer (Vue, React, …) themes
+ * from ONE stylesheet and cannot drift (PRD §6.5 / D-003). Import once in a Vue app via
+ * `import '@statusmap/vue/styles.css'` (which re-exports this), or directly via `import '@statusmap/core/styles.css'`.
+ * Every token is namespaced `--statusmap-*` so it never collides with your app's own custom properties.
+ * Override any of these on a parent element to re-theme; the components also carry neutral inline fallbacks,
+ * so they stay legible even if this stylesheet is not loaded. */
+
+:root {
+	/* Layout / typography */
+	--statusmap-page: #ffffff;
+	--statusmap-card: #f8fafc;
+	--statusmap-text: #0f172a;
+	--statusmap-muted: #64748b;
+	--statusmap-border: #e2e8f0;
+	--statusmap-border-strong: #cbd5e1;
+	--statusmap-link: #0f766e;
+	--statusmap-font-display: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--statusmap-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+	/* Tone families — the five buckets every StatusTone collapses onto (see @statusmap/core tone.ts). */
+	--statusmap-done-fg: #14653a;
+	--statusmap-done-bg: #dcfce7;
+	--statusmap-done-border: #86efac;
+	--statusmap-done-dot: #16a34a;
+
+	--statusmap-attention-fg: #92400e;
+	--statusmap-attention-bg: #fef3c7;
+	--statusmap-attention-border: #fcd34d;
+	--statusmap-attention-dot: #f59e0b;
+
+	--statusmap-problem-fg: #991b1b;
+	--statusmap-problem-bg: #fee2e2;
+	--statusmap-problem-border: #fca5a5;
+	--statusmap-problem-dot: #dc2626;
+
+	--statusmap-neutral-fg: #334155;
+	--statusmap-neutral-bg: #f1f5f9;
+	--statusmap-neutral-border: #cbd5e1;
+	--statusmap-neutral-dot: #64748b;
+
+	--statusmap-active-fg: #1e40af;
+	--statusmap-active-bg: #dbeafe;
+	--statusmap-active-border: #93c5fd;
+	--statusmap-active-dot: #2563eb;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--statusmap-page: #0b1120;
+		--statusmap-card: #111a2e;
+		--statusmap-text: #e2e8f0;
+		--statusmap-muted: #94a3b8;
+		--statusmap-border: #243049;
+		--statusmap-border-strong: #334155;
+		--statusmap-link: #5eead4;
+
+		--statusmap-done-fg: #86efac;
+		--statusmap-done-bg: #052e1a;
+		--statusmap-done-border: #166534;
+		--statusmap-done-dot: #22c55e;
+
+		--statusmap-attention-fg: #fcd34d;
+		--statusmap-attention-bg: #2e2206;
+		--statusmap-attention-border: #854d0e;
+		--statusmap-attention-dot: #f59e0b;
+
+		--statusmap-problem-fg: #fca5a5;
+		--statusmap-problem-bg: #2c0b0b;
+		--statusmap-problem-border: #7f1d1d;
+		--statusmap-problem-dot: #ef4444;
+
+		--statusmap-neutral-fg: #cbd5e1;
+		--statusmap-neutral-bg: #1a2436;
+		--statusmap-neutral-border: #334155;
+		--statusmap-neutral-dot: #64748b;
+
+		--statusmap-active-fg: #93c5fd;
+		--statusmap-active-bg: #0b1f3f;
+		--statusmap-active-border: #1e40af;
+		--statusmap-active-dot: #3b82f6;
+	}
+}

@@ -1,0 +1,14 @@
+# Example ledger for a fictional "Acme Notes" app — the demo data shipped with @statusmap/core.
+# Replace this whole directory with your own areas + features.
+- id: core
+  label: Core
+  order: 1
+  summary: 'The editor and search — the heart of the notes app.'
+- id: sync
+  label: Sync & offline
+  order: 2
+  summary: 'Keeping notes consistent across devices, online and off.'
+- id: billing
+  label: Billing
+  order: 3
+  summary: 'Subscriptions, invoices and plan management.'

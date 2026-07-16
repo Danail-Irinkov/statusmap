@@ -1,0 +1,19 @@
+id: conflict-resolution
+label: Conflict resolution
+areaId: sync
+lifecycle: planned
+summary: 'Merge concurrent edits to the same note from two devices.'
+prd:
+  - SYNC_SPEC
+intents:
+  - id: three-way-merge
+    label: Three-way merge concurrent edits
+    lifecycle: not_built
+    coverage:
+      proofLevel: none # no proof → "— Untested"
+      passing: false
+    workflows:
+      - { id: diff, label: Diff the two versions, lifecycle: not_built }
+      - { id: merge-ui, label: Show a merge UI, lifecycle: not_built }
+gaps:
+  - 'Auto-merge or always ask the user? Needs a product call.'

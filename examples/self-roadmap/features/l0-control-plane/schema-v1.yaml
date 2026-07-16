@@ -1,0 +1,45 @@
+id: schema-v1
+label: Schema v1 restructure (Phase S)
+areaId: l0-control-plane
+lifecycle: planned
+summary: 'Split the overloaded ledger object into 5 typed v1 contracts with an authored<->derived split that structurally bans false green. The a-thread-validated prerequisite for honest automation.'
+prd:
+  - AI_CODE_MAINTENANCE_FRAMEWORK_PRD
+intents:
+  - id: five-contracts
+    label: Define Ledger/Signal/Derived/WorkItem/Snapshot v1 in @statusmap/core
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+    workflows:
+      - { id: ledger-v1, label: 'Ledger v1 (authored: identity/lifecycle/bindings/ext)', lifecycle: planned }
+      - { id: signal-v1, label: 'Signal v1 (provenance-preserving)', lifecycle: planned }
+      - { id: derived-v1, label: 'Derived State v1 (computed health/proof/red)', lifecycle: planned }
+      - { id: workitem-v1, label: 'WorkItem v1 (control-plane envelope, not an engine)', lifecycle: planned }
+      - { id: snapshot-v1, label: 'Snapshot v1 (rendered + read by L2/L3)', lifecycle: planned }
+  - id: collapse-fork
+    label: 'S1 — @statusmap/core becomes the single schema owner'
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: canonical-ids-bindings
+    label: 'S2 — global nodeId + portable bindings[] replace the lane/intentId joins'
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: authored-derived-ban
+    label: 'S3 — ban authored proof fields (the structural anti-false-green wall)'
+    lifecycle: planned
+    note: 'An L1 worker structurally cannot write green; proof is ingested-only.'
+    coverage: { proofLevel: none, passing: false }
+  - id: provenance-signal
+    label: 'S4 — provenance Signal v1 replaces the flattening overlay'
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: workitem-envelope
+    label: 'S5 — minimal WorkItem v1 envelope (externalRunRef to ExecutorPipeline/AgentGoal)'
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: prove-one-slice
+    label: 'Exit S — one end-to-end slice (authored node -> signal -> derived red/green -> snapshot)'
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+gaps:
+  - 'Which slice proves Exit S: feature-health or the reference app editor drawer?'

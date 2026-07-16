@@ -1,0 +1,90 @@
+{
+  "name": "@statusmap/vue",
+  "version": "0.1.0",
+  "description": "Vue 3 renderer for @statusmap/core — draws a StatusMapDefinition as a status map and drill-down explorer.",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.vue"
+  ],
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./styles.css": "./src/styles/statusmap.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "package.json"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "vue-tsc --noEmit",
+    "prebuild:types": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build:types": "vue-tsc -p tsconfig.build.json",
+    "build:core": "npm --prefix ../core run build",
+    "build:bundle": "npm run build:core && vite build --config vite.lib.config.mjs",
+    "proof:demo": "node demo-shot.mjs",
+    "prelint:pkg": "npm run build:types",
+    "lint:pkg": "publint && attw --pack . --profile esm-only --ignore-rules internal-resolution-error --exclude-entrypoints styles.css",
+    "pack:dry": "npm pack --dry-run",
+    "prepack": "npm test && npm run typecheck && npm run build:types"
+  },
+  "keywords": [
+    "status",
+    "dashboard",
+    "vue",
+    "vue3",
+    "feature-health",
+    "roadmap"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Danail-Irinkov/statusmap.git",
+    "directory": "packages/vue"
+  },
+  "homepage": "https://github.com/Danail-Irinkov/statusmap#readme",
+  "bugs": {
+    "url": "https://github.com/Danail-Irinkov/statusmap/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "peerDependencies": {
+    "@statusmap/core": "^0.1.0",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "latest",
+    "@axe-core/playwright": "^4.10.2",
+    "@statusmap/core": "file:../core",
+    "@types/js-yaml": "^4.0.9",
+    "@vitejs/plugin-vue": "latest",
+    "@vue/test-utils": "latest",
+    "happy-dom": "latest",
+    "playwright": "^1.55.0",
+    "publint": "latest",
+    "typescript": "latest",
+    "vitest": "latest",
+    "vue": "^3.5.0",
+    "vue-tsc": "latest"
+  }
+}

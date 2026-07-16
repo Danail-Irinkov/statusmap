@@ -1,0 +1,28 @@
+# The AI Code-Maintenance Framework, mapping ITSELF — this roadmap is authored in the statusmap
+# ledger format and rendered by the statusmap library: a demo of itself.
+# Honesty on display: planning is done (green); the build layers are planned (down), so the headline
+# rollup is the TRUE state of the work, not a vanity number.
+- id: planning
+  label: Planning & validation
+  order: 1
+  summary: 'The PRD, the three layer specs, and two ChatGPT Pro validations — written and reviewed.'
+- id: l0-control-plane
+  label: 'L0 · Control plane'
+  order: 2
+  summary: 'The status-map library + the v1 schema restructure (Phase S) that makes it an honest control plane.'
+- id: l1-authoring
+  label: 'L1 · AI-maintained authoring'
+  order: 3
+  summary: 'AI workers maintain the map from a code diff; an honesty gate forbids green without a real artifact.'
+- id: l2-detection
+  label: 'L2 · Signal → red'
+  order: 4
+  summary: 'Runtime/CI signals flip a broken node red, attributed to the owning node and cited.'
+- id: l3-remediation
+  label: 'L3 · Reproduce → fix → green'
+  order: 5
+  summary: 'A worker reproduces the failure, fixes it, re-verifies at the destination, and flips it green.'
+- id: l4-framework
+  label: 'L4 · Continuous framework'
+  order: 6
+  summary: 'The closed loop running continuously, portable across consumer repos.'

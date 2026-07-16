@@ -1,0 +1,59 @@
+# ─────────────────────────────────────────────────────────────────────────────────────────────────────
+# NEW-FEATURE TEMPLATE — copy this file to `features/<area>/<id>.yaml`, then fill it in.
+# The `_` prefix makes the loader SKIP this file (it is never rendered as a feature). Copies are not.
+#
+# How it renders: feature → "Intent map" lead panel; each intent below → one COLLAPSED accordion row
+# carrying, at a glance, a TESTED verdict + a BLOCKING flag; expanding shows workflows + coverage + blockers.
+# The verdict/flag/blockers are DERIVED — do NOT author them. You author the inputs they read:
+#   • TESTED verdict  ← coverage.proofLevel + coverage.passing
+#       owning_e2e|destination + passing:true → "✓ Proven"   ·   unit + passing:true → "✓ Tested"
+#       heuristic → "~ Heuristic" (weak proof, regardless of passing)   ·   passing:false → "✗ Failing"
+#       none / no coverage → "— Untested"
+#   • BLOCKING flag   ← lifecycle + health + workflow notes
+#       not_built|planned → "⚠ Not built"   ·   health:down (or workflows avg down) → "⚠ Blocked"
+#       else, each non-healthy (down/partial) workflow that has a `note` → counted "⚠ N blocker(s)"
+#       a clean intent shows NO flag (absence is the signal)
+#   • BLOCKERS list (expanded) ← the `note` on each down/partial workflow
+#
+# Vocab: only LIFECYCLE live counts as fully up; built/beta/partial = partial (50%);
+# deferred/planned/not_built/unknown = down (0%). Cite a source for every status (prd[] / featureHealthId /
+# coverage.evidenceRef); put anything you cannot verify in gaps[] rather than asserting it.
+#
+# Beta-test ready gate: use lifecycle `beta` only when a limited real path is reachable, user-visible limits
+# are honest, targeted tests pass, rendered UI proof exists, and no critical blocker remains. Mock-only,
+# PRD-only, or fixture-only work stays `planned`.
+# ─────────────────────────────────────────────────────────────────────────────────────────────────────
+
+id: <kebab-id> # unique across the WHOLE ledger
+label: <Human Readable Name>
+areaId: <one of the ids in areas.yaml>
+lifecycle: <live | built | beta | partial | deferred | planned | not_built | unknown>
+# health: <up | partial | down>   # OPTIONAL override; else derived from lifecycle (live→up, built/beta/partial→partial, rest→down)
+summary: '<one line: what this feature does — shown as the intent-map lead>'
+# featureHealthId: <external runtime-health feed id, if one tracks it>   # links a live coverage overlay
+prd: # provenance — the docs you mined the status from
+  - <DOC_NAME_SPEC>
+# coveredChildIds: [<feature-id>, ...]   # OPTIONAL network edge — only for wrappers/spines that cover other features
+
+intents:
+  - id: <kebab-intent-id>
+    label: <the user-facing intent, e.g. "Search my notes">
+    lifecycle: <live | built | beta | partial | deferred | planned | not_built | unknown>
+    # health: <up | partial | down>   # OPTIONAL override
+    # note: '<caveat / current-state detail — shown as the item description>'
+    # lane: <join-key>                 # OPTIONAL — the key a live coverage overlay matches signals on
+    coverage:
+      proofLevel: <destination | owning_e2e | unit | heuristic | none> # drives the TESTED verdict
+      passing: <true | false> #                                          false → "✗ Failing"
+      owningE2e: <spec-that-owns-this-intent> #                          OPTIONAL
+      matrix: <harness/QA matrix that covers it> #                       OPTIONAL
+      lastRun: '<YYYY-MM-DD>' #                                          QUOTE IT (unquoted dates break the chip)
+      evidenceRef: <results.json pointer / test-state row>
+    workflows: # OPTIONAL concrete steps; a down/partial workflow's `note` becomes a per-item blocker
+      - id: <kebab>
+        label: <the step>
+        lifecycle: <live | built | beta | partial | deferred | planned | not_built | unknown>
+        # note: '<why it is partial / not built — surfaces in the Blocking list>'
+
+gaps: # real open items to confirm — shown as the "Gaps to confirm" panel
+  - '<thing you could not verify, framed as a question/decision>'

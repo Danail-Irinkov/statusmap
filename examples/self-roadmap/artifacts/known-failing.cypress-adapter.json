@@ -1,0 +1,36 @@
+{
+	"_meta": {
+		"LABEL": "CLEARLY-LABELED KNOWN-FAILING FIXTURE — read before using.",
+		"note": "This is a TDD artifact for an UNBUILT capability: a Cypress test-result adapter that @statusmap/core does not have yet (it ingests vitest + playwright today). The tests are written first and therefore RED. It is NOT part of `npm test`, NOT a CI regression, and does NOT represent broken shipped code.",
+		"why": "The a-thread honesty rule forbids faking a broken product node just to light up the 'Failing' filter. Instead we bind ONE real, honest, non-gating known-failure artifact so the renderer's failing-first proof tree (red auto-opens, ✗/○ verdicts, failing-first ordering) is demonstrated truthfully. The owning self-roadmap node is lifecycle:planned with passing:false.",
+		"producer": "vitest (hand-authored fixture, vitest-JSON shape)",
+		"capturedAt": "2026-06-23",
+		"nonGating": true
+	},
+	"numTotalTests": 3,
+	"numPassedTests": 0,
+	"numFailedTests": 2,
+	"testResults": [
+		{
+			"name": "examples/self-roadmap/artifacts/cypress-adapter.test.ts",
+			"status": "failed",
+			"assertionResults": [
+				{
+					"title": "parses a Cypress run JSON into a failing-first proof tree",
+					"ancestorTitles": ["Cypress adapter — TDD for an UNBUILT capability (known-failing, non-gating)"],
+					"status": "failed"
+				},
+				{
+					"title": "joins cypress specs to the owning intent by spec file",
+					"ancestorTitles": ["Cypress adapter — TDD for an UNBUILT capability (known-failing, non-gating)"],
+					"status": "failed"
+				},
+				{
+					"title": "collapses cypress retries to the last attempt",
+					"ancestorTitles": ["Cypress adapter — TDD for an UNBUILT capability (known-failing, non-gating)"],
+					"status": "skipped"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Status map — unified runnable tree + live-run player (rethink mockup)</title>
+<style>
+  :root{
+    --bg:#f7fafc; --ink:#1f2933; --muted:#64748b; --line:#e3e9f0; --card:#ffffff;
+    --done-bg:#dcfce7;--done-fg:#166534;--done-dot:#16a34a;--done-bd:#86efac;
+    --warn-bg:#fef9c3;--warn-fg:#854d0e;--warn-dot:#ca8a04;--warn-bd:#fde047;
+    --prob-bg:#fee2e2;--prob-fg:#991b1b;--prob-dot:#dc2626;--prob-bd:#fca5a5;
+    --neut-bg:#f1f5f9;--neut-fg:#475569;--neut-dot:#94a3b8;--neut-bd:#e2e8f0;
+    --act-bg:#dbeafe;--act-fg:#1e40af;--act-dot:#3b82f6;--act-bd:#93c5fd;
+    --mono:ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif;padding:24px 28px 80px}
+  h1{font-size:20px;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:6px}
+  .note{background:#eef6ff;border:1px solid #cfe3ff;color:#234;border-radius:8px;padding:8px 12px;font-size:12.5px;margin:10px 0 14px}
+  .note code{font-family:var(--mono);font-size:11.5px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:8px 0 16px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+  .d-done{background:var(--done-dot)}.d-warn{background:var(--warn-dot)}.d-prob{background:var(--prob-dot)}
+  .d-neut{background:var(--neut-dot)}.d-act{background:var(--act-dot);animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  .tree{max-width:1000px}
+  .area{border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:12px;overflow:hidden}
+  .area>.row{padding:12px 14px;background:#fbfdff}
+  .row{display:flex;align-items:center;gap:10px}
+  .twist{width:16px;color:var(--muted);cursor:pointer;user-select:none;flex:none;text-align:center}
+  .label{font-weight:600}
+  .area .label{font-size:15px}
+  .meta{color:var(--muted);font-size:12px}
+  .spacer{flex:1}
+  .rollup{height:8px;width:120px;border-radius:99px;background:var(--neut-bg);overflow:hidden;flex:none}
+  .rollup>i{display:block;height:100%;background:var(--done-dot)}
+  .pill{font-size:11px;padding:1px 8px;border-radius:99px;background:var(--neut-bg);color:var(--neut-fg);font-weight:600;border:1px solid var(--neut-bd)}
+  .pill.done{background:var(--done-bg);color:var(--done-fg);border-color:var(--done-bd)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn-fg);border-color:var(--warn-bd)}
+  .chip{font-size:10.5px;padding:1px 7px;border-radius:6px;background:var(--neut-bg);color:var(--neut-fg);font-family:var(--mono)}
+  .kids{padding:0 0 8px 0;border-top:1px solid var(--line)}
+  .feature>.row{padding:9px 14px 9px 30px}
+  .intent>.row{padding:7px 14px 7px 52px}
+  .leaf{padding:5px 14px 5px 74px;display:flex;align-items:center;gap:9px;border-top:1px dashed #eef2f6}
+  .feature .label{font-size:13.5px}
+  .intent .label{font-size:13px;font-weight:500}
+  .leaf .label{font-size:12.5px;font-weight:400}
+  .hide{display:none}
+  .ago{font-size:10.5px;color:var(--muted)}
+
+  /* the ONLY run affordance on the tree: a ▶ Run that STARTS a run + flips the node. No transport here. */
+  .run{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border:1px solid var(--act-bd);
+       background:#fff;color:var(--act-fg);border-radius:7px;padding:2px 9px;cursor:pointer;flex:none}
+  .run:hover{background:var(--act-bg)}
+  .run.busy{background:var(--act-bg);border-color:var(--act-dot)}
+  .leaf.running{background:linear-gradient(90deg,var(--act-bg),transparent 70%)}
+  .ann{font-size:11px;color:#9a6b00;background:#fffbe6;border:1px dashed #f5d97a;border-radius:6px;padding:1px 7px;margin-left:6px}
+  .gone{max-width:1000px;border:1px dashed #f1b0b0;background:#fff5f5;border-radius:10px;padding:10px 14px;margin:0 0 14px;color:#7a2b2b;font-size:12.5px}
+
+  /* THE LIVE-RUN PLAYER — a detached, chromeless pop-out window. Exists ONLY while a run is live.
+     Layout: feed (top) · selected-tracks list (middle) · player controls (bottom). */
+  /* defaults to ~50% of the screen (70vw × 72vh ≈ 0.50 area) and is freely resizable (drag the corner). */
+  .player{position:fixed;top:8vh;left:15vw;width:70vw;height:72vh;min-width:420px;min-height:320px;max-width:96vw;max-height:92vh;
+          resize:both;overflow:hidden;border:2px solid var(--act-dot);border-radius:12px;
+          background:#0b1220;box-shadow:0 18px 46px rgba(2,8,23,.4);z-index:50;display:flex;flex-direction:column}
+  .player .bar{display:flex;align-items:center;gap:7px;padding:6px 10px;background:#111827;color:#cbd5e1;font:11px var(--mono)}
+  .player .bar .live{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:pulse 1.1s infinite;flex:none}
+  .player .bar .x{margin-left:auto;cursor:pointer;color:#94a3b8;font-size:15px;line-height:1}
+  .player .feed{flex:1 1 auto;min-height:0;background:repeating-linear-gradient(45deg,#0d1626,#0d1626 14px,#101c30 14px,#101c30 28px);
+                display:flex;align-items:center;justify-content:center;color:#41618f;font:12px var(--mono);text-align:center}
+  .player .tracks{flex:0 0 auto;background:#0b1220;max-height:30%;overflow:auto;padding:6px 6px 4px;border-top:1px solid #1f2937}
+  .player .tracks .hd{font:10px var(--mono);letter-spacing:.05em;color:#5b7088;padding:2px 8px 4px}
+  .player .track{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:7px;font:11.5px var(--mono);color:#aab8cc}
+  .player .track.playing{background:#152a4d;color:#fff}
+  .player .track.queued{opacity:.7}
+  .player .track .pico{width:13px;text-align:center;flex:none;font-size:10px;color:#6b82a6}
+  .player .controls{display:flex;align-items:center;gap:12px;justify-content:center;padding:9px;background:#111827;border-top:1px solid #1f2937}
+  .player .pbtn{width:34px;height:30px;border:1px solid #2b3a52;background:#0e1828;color:#cbd5e1;border-radius:8px;cursor:pointer;font-size:14px}
+  .player .pbtn:hover{background:#16243a}
+  .player .pbtn.play{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:700}
+  .player .prog{font:11px var(--mono);color:#8aa0c0;margin-left:4px}
+</style>
+</head>
+<body>
+  <h1>Storefront Coverage</h1>
+  <div class="sub">/storefront/status — one runnable coverage tree + a live-run player. Mockup of the rethink (not live).</div>
+
+  <div class="gone">
+    <b>Removed:</b> the separate “granular tests” panel that used to stack on top. One tree only — the map below.
+  </div>
+
+  <div class="note">
+    <b>How it works now:</b> the map tree carries <b>only ▶ Run + the in-place status flip</b> — no transport on the tree.
+    Hitting Run <b>opens the live-run player</b> (bottom-right): a detached chromeless window with the <b>screencast feed</b> on top,
+    the <b>list of selected tracks</b> (the tests in this run) in the middle, and the <b>player controls (⏮ ⏯ ⏭) along the bottom</b>.
+    The player exists <b>only while a run is live</b>; close it (or run-end) and it’s gone. The map just shows the results flip.
+    It opens at <b>~50% of the screen</b> and is <b>freely resizable</b> (drag the corner).
+  </div>
+
+  <div class="legend">
+    <span><i class="dot d-done"></i>pass</span>
+    <span><i class="dot d-prob"></i>fail</span>
+    <span><i class="dot d-warn"></i>skip / partial</span>
+    <span><i class="dot d-act"></i>running</span>
+    <span><i class="dot d-neut"></i>not run</span>
+    <span style="margin-left:auto">▶ on a node = runnable (starts a run → opens the player)</span>
+  </div>
+
+  <div class="tree" id="tree">
+    <div class="area"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-done"></span><span class="label">Store foundation</span><span class="meta">app shell · runtime · config · menus</span><span class="spacer"></span><span class="rollup"><i style="width:90%"></i></span><span class="pill done">9/10</span></div></div>
+    <div class="area"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-done"></span><span class="label">Browse &amp; discover</span><span class="meta">home · sections · search · category · blog/KB</span><span class="spacer"></span><span class="rollup"><i style="width:85%"></i></span><span class="pill done">11/13</span></div></div>
+    <div class="area"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-warn"></span><span class="label">Product &amp; configure</span><span class="meta">PDP types · design editor · upload · saved designs</span><span class="spacer"></span><span class="rollup"><i style="width:78%"></i></span><span class="pill warn">14/18</span></div></div>
+    <div class="area"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-done"></span><span class="label">Price</span><span class="meta">live pricing for every active product</span><span class="spacer"></span><span class="rollup"><i style="width:100%"></i></span><span class="pill done">4/4</span></div></div>
+    <div class="area"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-done"></span><span class="label">Cart &amp; checkout</span><span class="meta">cart behaviors · end-to-end order placement</span><span class="spacer"></span><span class="rollup"><i style="width:92%"></i></span><span class="pill done">12/13</span></div></div>
+
+    <div class="area">
+      <div class="row"><span class="twist" data-t>▾</span><span class="dot d-done"></span><span class="label">Account &amp; access</span><span class="meta">sign in · access control · account dashboard</span><span class="spacer"></span><span class="rollup"><i style="width:88%"></i></span><span class="pill done">14/16</span></div>
+      <div class="kids">
+        <div class="feature"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-done"></span><span class="label">Sign in</span><span class="chip">login.spec.mjs</span><span class="spacer"></span><span class="pill done">2/2</span><span class="run" onclick="runNode(this)">▶ Run</span></div></div>
+        <div class="feature"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-done"></span><span class="label">Access control</span><span class="chip">auth-gating.spec.mjs</span><span class="spacer"></span><span class="pill done">2/2</span><span class="run" onclick="runNode(this)">▶ Run</span></div></div>
+
+        <div class="feature">
+          <div class="row"><span class="twist" data-t>▾</span><span class="dot d-done"></span><span class="label">Account dashboard</span><span class="meta">14 tests · functional-first</span><span class="spacer"></span><span class="rollup"><i style="width:100%"></i></span><span class="pill done">11/11 · 2 skip</span><span class="run" onclick="runNode(this)">▶ Run all</span></div>
+          <div class="kids">
+            <div class="intent">
+              <div class="row"><span class="twist" data-t>▾</span><span class="dot d-done"></span><span class="label">Dashboard</span><span class="chip">account.spec.mjs</span><span class="spacer"></span><span class="pill done">5/5</span><span class="run" onclick="runNode(this)">▶ Run</span></div>
+              <div class="kids">
+                <div class="leaf"><span class="dot d-done"></span><span class="label">shell renders the sidebar + default tab</span><span class="spacer"></span><span class="run" onclick="runNode(this)">▶</span></div>
+                <div class="leaf"><span class="dot d-done"></span><span class="label">Orders pill → Order History table</span><span class="spacer"></span><span class="run" onclick="runNode(this)">▶</span></div>
+                <div class="leaf"><span class="dot d-done"></span><span class="label">Estimates pill → Estimate History table</span><span class="spacer"></span><span class="run" onclick="runNode(this)">▶</span></div>
+                <div class="leaf running"><span class="dot d-act"></span><span class="label">searching Orders refetches with the typed query</span><span class="ago">running…</span><span class="spacer"></span><span class="run busy" onclick="runNode(this)">▶</span></div>
+                <div class="leaf"><span class="dot d-done"></span><span class="label">open order row → detail items table</span><span class="ago">2m ago</span><span class="spacer"></span><span class="run" onclick="runNode(this)">▶</span></div>
+              </div>
+            </div>
+            <div class="intent"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-done"></span><span class="label">Order actions</span><span class="chip">after-order.spec.mjs</span><span class="ann">was orphaned — now wired in</span><span class="spacer"></span><span class="pill done">1 pass · 2 skip</span><span class="run" onclick="runNode(this)">▶ Run</span></div></div>
+            <div class="intent"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-done"></span><span class="label">Self-service</span><span class="chip">account-self-service.spec.mjs</span><span class="spacer"></span><span class="pill done">3/3</span><span class="run" onclick="runNode(this)">▶ Run</span></div></div>
+            <div class="intent"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-done"></span><span class="label">Shipment tracking</span><span class="chip">account-shipment-table.spec.mjs</span><span class="spacer"></span><span class="pill done">2/2</span><span class="run" onclick="runNode(this)">▶ Run</span></div></div>
+            <div class="intent"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-neut"></span><span class="label">Layout / overflow</span><span class="meta">structural — sorted last</span><span class="chip">account-layout.spec.mjs</span><span class="spacer"></span><span class="pill">1 test</span><span class="run" onclick="runNode(this)">▶ Run</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="area"><div class="row"><span class="twist" data-t>▸</span><span class="dot d-warn"></span><span class="label">After the order</span><span class="meta">proof approval · lead capture / demo</span><span class="spacer"></span><span class="rollup"><i style="width:70%"></i></span><span class="pill warn">5/7</span></div></div>
+  </div>
+
+  <!-- THE LIVE-RUN PLAYER (only while running): feed · selected-tracks list · controls at the bottom -->
+  <div class="player" id="player">
+    <div class="bar"><span class="live"></span> LIVE RUN · Account dashboard <span style="margin-left:auto;color:#5b7088;font-size:10px">⤡ resizable · opens ~50% screen</span> <span class="x" style="margin-left:10px" onclick="document.getElementById('player').style.display='none'">✕</span></div>
+    <div class="feed">headless browser feed<br/>(chromeless pop-out window)</div>
+    <div class="tracks">
+      <div class="hd">SELECTED TRACKS · 5</div>
+      <div class="track"><span class="pico">✓</span>shell renders the sidebar + default tab</div>
+      <div class="track"><span class="pico">✓</span>Orders pill → Order History table</div>
+      <div class="track"><span class="pico">✓</span>Estimates pill → Estimate History table</div>
+      <div class="track playing"><span class="pico">▶</span>searching Orders refetches with the typed query</div>
+      <div class="track queued"><span class="pico">•</span>open order row → detail items table</div>
+    </div>
+    <div class="controls">
+      <button class="pbtn" title="previous track" onclick="seek(-1)">⏮</button>
+      <button class="pbtn play" id="play" title="play / pause" onclick="togglePlay()">⏸</button>
+      <button class="pbtn" title="next track" onclick="seek(1)">⏭</button>
+      <span class="prog" id="prog">track 4 / 5 · playing</span>
+    </div>
+  </div>
+
+<script>
+  document.querySelectorAll('[data-t]').forEach(t=>t.addEventListener('click',()=>{
+    const kids=t.closest('.area,.feature,.intent').querySelector('.kids');
+    if(!kids)return; const open=t.textContent.trim()==='▾'; t.textContent=open?'▸':'▾'; kids.classList.toggle('hide',open);
+  }));
+  // a Run on the tree starts a run (flip the node) AND opens the player
+  function runNode(btn){const row=btn.closest('.leaf,.row');const dot=row.querySelector('.dot');
+    dot.className='dot d-act';btn.classList.add('busy');document.getElementById('player').style.display='flex';
+    setTimeout(()=>{dot.className='dot d-done';btn.classList.remove('busy');},1500);}
+  let playing=true;
+  function togglePlay(){playing=!playing;const b=document.getElementById('play');b.textContent=playing?'⏸':'▶';
+    const p=document.getElementById('prog');p.textContent=p.textContent.replace(/playing|paused.*/,'')+(playing?'playing':'paused (holds at track boundary)');}
+  function seek(d){const list=[...document.querySelectorAll('.player .track')];let i=list.findIndex(t=>t.classList.contains('playing'));
+    if(i<0)i=0;list[i].classList.remove('playing');const ni=Math.max(0,Math.min(list.length-1,i+d));
+    list[ni].classList.add('playing');document.getElementById('prog').textContent='track '+(ni+1)+' / '+list.length+(playing?' · playing':' · paused');}
+</script>
+</body>
+</html>

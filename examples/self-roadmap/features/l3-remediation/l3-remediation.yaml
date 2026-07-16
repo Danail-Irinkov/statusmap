@@ -1,0 +1,27 @@
+id: l3-remediation
+label: Autonomous remediation
+areaId: l3-remediation
+lifecycle: planned
+summary: 'A red node triggers reproduce -> fix -> re-verify -> green, run off-session, gated by an ApprovalGate before merge. Spec drafted; implementation planned.'
+prd:
+  - CODE_MAINTENANCE_L3_REMEDIATION_SPEC
+intents:
+  - id: reproduce-red
+    label: Reproduce the failure before any fix (G3)
+    lifecycle: planned
+    note: 'Derived from the owning test + signal + driving the app; unreproducible -> parked-red, never "fixed".'
+    coverage: { proofLevel: none, passing: false }
+  - id: fix-via-swarm
+    label: Fix via the ExecutorPipeline + swarm/night-shift loop
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: verify-and-green
+    label: Re-verify at the destination; flip green only on real proof (G1)
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+  - id: approval-gate
+    label: One ApprovalGate before merge / external write (G4)
+    lifecycle: planned
+    coverage: { proofLevel: none, passing: false }
+gaps:
+  - 'D-001 (autonomy cutover) + D-002 (which fix classes auto-merge) gate going autonomous.'

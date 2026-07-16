@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "statusmap-package-release-proof",
+  "generatedAt": "2026-07-16T03:16:49+03:00",
+  "command": "node scripts/verify-packed-consumer.mjs",
+  "environment": {
+    "node": "v22.22.0",
+    "platform": "win32"
+  },
+  "result": "passed",
+  "consumer": "fresh Vue 3 + Vite project with no package-specific transpilation settings",
+  "checks": [
+    "packed manifests matched exact allowlists",
+    "installed package trees and source maps passed the public leak scan",
+    "@statusmap/core resolved from the tarball and executed through ESM and CommonJS",
+    "@statusmap/vue resolved its source runtime and generated declarations from the tarball",
+    "the production consumer build passed",
+    "the production dependency audit passed"
+  ],
+  "packedFiles": {
+    "@statusmap/core": 13,
+    "@statusmap/vue": 50
+  },
+  "consumerBuild": {
+    "modules": 65,
+    "javascriptKb": 173.31,
+    "javascriptGzipKb": 58.32,
+    "cssKb": 29.93,
+    "cssGzipKb": 4.82
+  }
+}
