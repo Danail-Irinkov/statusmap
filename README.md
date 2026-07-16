@@ -15,12 +15,6 @@ Two packages:
 
 ## Install
 
-> **Release-candidate note:** the package manifests and tarballs are ready, but `@statusmap/core` and
-> `@statusmap/vue` are not in the npm registry yet. The commands below become available after the v0.1 npm
-> release. Do not use the repository root as an npm Git dependency: this repository contains two independent
-> package roots, and npm Git installs cannot select a workspace subdirectory. Until publication, clone this
-> public repository and consume locally packed tarballs or an explicit local package path.
-
 Install the renderer for a Vue app:
 
 ```bash
