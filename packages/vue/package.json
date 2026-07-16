@@ -1,6 +1,6 @@
 {
   "name": "@statusmap/vue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vue 3 renderer for @statusmap/core — draws a StatusMapDefinition as a status map and drill-down explorer.",
   "type": "module",
   "sideEffects": [
@@ -35,6 +35,7 @@
     "build:core": "npm --prefix ../core run build",
     "build:bundle": "npm run build:core && vite build --config vite.lib.config.mjs",
     "proof:demo": "node demo-shot.mjs",
+    "proof:readme": "node readme-shot.mjs",
     "prelint:pkg": "npm run build:types",
     "lint:pkg": "publint && attw --pack . --profile esm-only --ignore-rules internal-resolution-error --exclude-entrypoints styles.css",
     "pack:dry": "npm pack --dry-run",

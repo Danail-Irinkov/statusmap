@@ -7,6 +7,12 @@ are cut from this public repository.
 
 ## Unreleased
 
+## 0.1.1 - 2026-07-16
+
+- Added real overview, feature-proof, and mobile dark-mode screenshots to the repository and npm package pages.
+- Added a small, valid starter ledger with placeholders that begins planned and unproven.
+- Reordered the package introductions around the rendered result, honest YAML, and minimal Vue setup.
+
 ## 0.1.0 - 2026-07-16
 
 - Stabilized the v0.1 core entry point by keeping unfinished schema automation private.

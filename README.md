@@ -1,10 +1,9 @@
 # statusmap
 
-An **honest, test-aware project status map**. Describe your app as a tree of
-areas → features → user intents → workflows in plain YAML (or JSON), and render
-it as a drill-down status explorer whose health is computed by rules that *don't
-let you lie to yourself*: deferred and not-built work counts as **down**, and a
-feature only reads "proven" when a real test artifact says so.
+Turn plain YAML into an **honest, test-aware map of what your product can actually do**.
+Planned work stays down, failing proof stays red, and every headline rolls up from the details beneath it.
+
+![Statusmap overview showing mixed product health across areas and features](./docs/images/statusmap-overview.png)
 
 Two packages:
 
@@ -27,7 +26,47 @@ Use the framework-agnostic core by itself:
 npm install @statusmap/core
 ```
 
-## Quick start
+## Start with honest YAML
+
+Create an area:
+
+```yaml
+# status/areas.yaml
+- id: product
+  label: Your product
+  summary: 'Replace this with the part of your product this area owns.'
+```
+
+Then add a feature:
+
+```yaml
+# status/features/product/your-feature.yaml
+id: your-feature
+label: Your feature
+areaId: product
+lifecycle: planned
+summary: 'Replace this with the user-visible outcome.'
+
+intents:
+  - id: primary-outcome
+    label: Complete the main user outcome
+    lifecycle: planned
+    coverage:
+      proofLevel: none
+    workflows:
+      - id: first-step
+        label: Replace with the first real step
+        lifecycle: planned
+
+gaps:
+  - 'What must be true before this can move from planned to beta?'
+```
+
+The starter is deliberately `planned` with `proofLevel: none`, so a new map cannot look green before the
+work is real. Copy the [`starter-ledger`](./packages/core/examples/starter-ledger) or explore the richer
+fictional [`Acme Notes ledger`](./packages/core/examples/ledger).
+
+## Render it
 
 ```vue
 <script setup lang="ts">
@@ -50,8 +89,13 @@ status/
   features/<area>/<feature>.yaml
 ```
 
-See [`packages/core/examples/ledger`](./packages/core/examples/ledger) and
-[`examples/self-roadmap`](./examples/self-roadmap) for sample ledgers.
+The same map drills into user outcomes, workflows, gaps, and failing-first test evidence:
+
+![Statusmap feature detail showing a failing proof tree](./docs/images/statusmap-feature-proof.png)
+
+The renderer is responsive and includes dark-mode tokens:
+
+![Statusmap mobile overview in dark mode](./docs/images/statusmap-mobile-dark.png)
 
 ## Why it's different
 

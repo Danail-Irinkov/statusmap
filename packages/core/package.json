@@ -1,6 +1,6 @@
 {
   "name": "@statusmap/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Honest, test-aware project status maps: the typed definition contract, the status policy (health math + proof-level ladder), the rollup engine, and vitest/playwright test-artifact ingestion. Framework-agnostic, zero runtime dependencies.",
   "type": "module",
   "sideEffects": false,

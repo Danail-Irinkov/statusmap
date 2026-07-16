@@ -1,0 +1,4 @@
+# Start with one area, then replace these placeholders with your product structure.
+- id: product
+  label: Your product
+  summary: 'Replace this with the part of your product this area owns.'

@@ -1,0 +1,20 @@
+# Planned + no proof is intentional: the starter cannot appear green before the work is real.
+id: your-feature
+label: Your feature
+areaId: product
+lifecycle: planned
+summary: 'Replace this with the user-visible outcome.'
+
+intents:
+  - id: primary-outcome
+    label: Complete the main user outcome
+    lifecycle: planned
+    coverage:
+      proofLevel: none
+    workflows:
+      - id: first-step
+        label: Replace with the first real step
+        lifecycle: planned
+
+gaps:
+  - 'What must be true before this can move from planned to beta?'

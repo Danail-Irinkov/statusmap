@@ -14,6 +14,7 @@ import {
 } from '../src/index'
 
 const ledgerDir = fileURLToPath(new URL('../examples/ledger', import.meta.url))
+const starterLedgerDir = fileURLToPath(new URL('../examples/starter-ledger', import.meta.url))
 
 function walk(dir: string): string[] {
 	return readdirSync(dir).flatMap((name) => {
@@ -22,15 +23,25 @@ function walk(dir: string): string[] {
 	})
 }
 
-function loadExample() {
-	const areasYaml = readFileSync(join(ledgerDir, 'areas.yaml'), 'utf8')
-	const featuresDir = join(ledgerDir, 'features')
+function loadExample(dir = ledgerDir) {
+	const areasYaml = readFileSync(join(dir, 'areas.yaml'), 'utf8')
+	const featuresDir = join(dir, 'features')
 	const featureFiles: Record<string, string> = {}
 	for (const abs of walk(featuresDir)) {
-		if (abs.endsWith('.yaml')) featureFiles[relative(ledgerDir, abs)] = readFileSync(abs, 'utf8')
+		if (abs.endsWith('.yaml')) featureFiles[relative(dir, abs)] = readFileSync(abs, 'utf8')
 	}
 	return parseLedgerNetwork({ areasYaml, featureFiles }, (s) => yamlLoad(s))
 }
+
+describe('starter ledger', () => {
+	it('loads cleanly and stays visibly unproven', () => {
+		const ledger = loadExample(starterLedgerDir)
+		expect(validateLedger(ledger)).toEqual([])
+		expect(ledger.features).toHaveLength(1)
+		expect(rollupFeatures(ledger.features).healthPct).toBe(0)
+		expect(ledger.features[0]?.intents?.[0]?.coverage?.proofLevel).toBe('none')
+	})
+})
 
 describe('example ledger (Acme Notes)', () => {
 	it('loads + validates clean', () => {

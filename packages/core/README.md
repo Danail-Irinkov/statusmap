@@ -7,11 +7,50 @@ it into a validated ledger you can render. The opinionated, honest defaults are 
 proven work counts as fully "up", and deferred / planned / not-built work counts as **down** — so the
 headline % tells the truth.
 
+![Statusmap overview showing mixed product health across areas and features](https://raw.githubusercontent.com/Danail-Irinkov/statusmap/main/docs/images/statusmap-overview.png)
+
 ```bash
 npm install @statusmap/core
 ```
 
-## Quick start — YAML in, a bundle out
+## Start with honest YAML
+
+```yaml
+# status/areas.yaml
+- id: product
+  label: Your product
+  summary: 'Replace this with the part of your product this area owns.'
+```
+
+```yaml
+# status/features/product/your-feature.yaml
+id: your-feature
+label: Your feature
+areaId: product
+lifecycle: planned
+summary: 'Replace this with the user-visible outcome.'
+
+intents:
+  - id: primary-outcome
+    label: Complete the main user outcome
+    lifecycle: planned
+    coverage:
+      proofLevel: none
+    workflows:
+      - id: first-step
+        label: Replace with the first real step
+        lifecycle: planned
+
+gaps:
+  - 'What must be true before this can move from planned to beta?'
+```
+
+This begins at 0% on purpose: the feature is planned and has no proof. Copy the
+[`starter-ledger`](https://github.com/Danail-Irinkov/statusmap/tree/main/packages/core/examples/starter-ledger)
+or inspect the richer fictional
+[`Acme Notes ledger`](https://github.com/Danail-Irinkov/statusmap/tree/main/packages/core/examples/ledger).
+
+## YAML in, a bundle out
 
 ```ts
 import { createStatusMap } from '@statusmap/core'
@@ -38,10 +77,9 @@ status/
 ```
 
 Each feature: `id` / `label` / `areaId` / `lifecycle` (+ optional `summary`, `intents` → `workflows`,
-`coverage`, `gaps`). Copy the
+`coverage`, `gaps`). The detailed
 [`features/_template.yaml`](https://github.com/Danail-Irinkov/statusmap/blob/main/packages/core/examples/ledger/features/_template.yaml)
-file to start; a worked synthetic example app lives in the
-[`examples/ledger` directory](https://github.com/Danail-Irinkov/statusmap/tree/main/packages/core/examples/ledger).
+documents the full authoring surface.
 
 ## The honest rules (`DEFAULT_STATUS_RULES`)
 
@@ -59,6 +97,8 @@ decides (it is reference + docs, not a configuration surface):
 ## Status from real test artifacts
 
 Feed it your CI output and each intent gets a navigable, failing-first proof tree:
+
+![Statusmap feature detail showing a failing proof tree](https://raw.githubusercontent.com/Danail-Irinkov/statusmap/main/docs/images/statusmap-feature-proof.png)
 
 ```ts
 import { buildTestResults, applyCoverageTests } from '@statusmap/core'

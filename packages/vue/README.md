@@ -2,9 +2,15 @@
 
 **Drop in YAML, get a rendered, filterable status map.** The everyday API is one component.
 
+![Statusmap overview showing mixed product health across areas and features](https://raw.githubusercontent.com/Danail-Irinkov/statusmap/main/docs/images/statusmap-overview.png)
+
 ```bash
 npm install @statusmap/vue @statusmap/core vue
 ```
+
+Start with the copy-ready
+[`starter-ledger`](https://github.com/Danail-Irinkov/statusmap/tree/main/packages/core/examples/starter-ledger).
+It begins as `planned` with `proofLevel: none`, so the map cannot look green before the work is real.
 
 ```vue
 <script setup lang="ts">
@@ -27,8 +33,14 @@ That's it. `<StatusMap>` parses the YAML (it bundles js-yaml), builds the ledger
 the overview / area / feature / "all on one page" views, the click-through drill-down, and the **review
 filter** (status × verdict) — with **no router wiring** (it manages its own drill state internally).
 
+![Statusmap feature detail showing a failing proof tree](https://raw.githubusercontent.com/Danail-Irinkov/statusmap/main/docs/images/statusmap-feature-proof.png)
+
 The YAML structure is `areas.yaml` + `features/<area>/<id>.yaml`; see the `@statusmap/core`
 README for the shape and a synthetic example app.
+
+The renderer is responsive and includes dark-mode tokens:
+
+![Statusmap mobile overview in dark mode](https://raw.githubusercontent.com/Danail-Irinkov/statusmap/main/docs/images/statusmap-mobile-dark.png)
 
 ### Props
 
