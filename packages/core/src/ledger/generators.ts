@@ -285,6 +285,14 @@ export function testedVerdict(c?: Coverage): StatusCardVerdict {
 	return { label: '✓ Tested', tone: 'live' } // unit + passing
 }
 
+export function coverageTierVerdict(c?: Coverage): StatusCardVerdict | undefined {
+	if (!c?.tier) return undefined
+	if (c.tier === 'Amber') {
+		return { label: 'Amber · no reliable readback', tone: 'yellow' }
+	}
+	return { label: c.tier, tone: 'live' }
+}
+
 // The specific blockers tied to ONE intent: any down workflow (with or without a note) + any partial
 // workflow that documents WHY. The intent's own `note` is shown as the item's description line.
 export function intentBlockers(intent: UserIntent): string[] {
@@ -393,6 +401,7 @@ export function intentToCard(intent: UserIntent, featureId?: string): StatusCard
 		})),
 		coverage: coverageChips(intent.coverage),
 		tested: testedVerdict(intent.coverage),
+		certification: coverageTierVerdict(intent.coverage),
 		blocking: blockingFlag(intent, blockers),
 		blockers: blockers.length ? blockers : undefined,
 		testTree: coverageTree(intent.coverage, featureId),
@@ -674,6 +683,7 @@ export function ledgerToQaScan(ledger: Ledger, opts: GeneratorOptions = {}): Sta
 						statusLabel: QA_META[st].label,
 						intent: `in ${f.label}${i.note ? ` — ${i.note}` : ''}`,
 						coverage: coverageChips(i.coverage),
+						certification: coverageTierVerdict(i.coverage),
 						group: area.id,
 					},
 				})

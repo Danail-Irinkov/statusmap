@@ -25,6 +25,7 @@ const section: CardsSection = {
 				{ label: 'api-sync.spec.ts', mono: true },
 			],
 			tested: { label: '✗ Failing', tone: 'red' },
+			certification: { label: 'Amber · no reliable readback', tone: 'yellow' },
 			blocking: { label: 'Blocked', tone: 'blocked' },
 			blockers: ['Billing key is expired'],
 			testTree: [
@@ -85,6 +86,7 @@ describe('StatusMapCards', () => {
 		expect(primary.attributes('style') || '').toContain('--tone-bg')
 		expect(primary.text()).toContain('Sync contacts')
 		expect(primary.text()).toContain('✗ Failing')
+		expect(primary.text()).toContain('Amber · no reliable readback')
 		expect(primary.text()).toContain('Blocked')
 
 		const details = primary.element as HTMLDetailsElement

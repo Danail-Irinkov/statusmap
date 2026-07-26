@@ -121,6 +121,7 @@ export type StatusCard = {
 	to?: string //                           optional drill target — renders the card as a link
 	coverage?: Chip[] //                     test-coverage chips (proof level / owning e2e / matrix / last run)
 	tested?: StatusCardVerdict //            collapsed-row "how well tested" verdict (✓ proven / ~ heuristic / ✗ failing / — untested)
+	certification?: StatusCardVerdict //     connector read/write tier; absent for non-connector intents
 	blocking?: StatusCardVerdict //          collapsed-row "is anything blocking it" flag; absent = nothing blocks it
 	blockers?: string[] //                   the specific blocker lines (expanded body); pairs with `blocking`
 	testTree?: StatusCardTreeNode[] //       the navigable test-ledger tree (expanded body), failing-first

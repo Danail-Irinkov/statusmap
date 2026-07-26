@@ -46,6 +46,12 @@
 						>{{ card.tested.label }}</span
 					>
 					<span
+						v-if="card.certification"
+						class="status-map-cards__pill"
+						:style="vars(card.certification.tone)"
+						>{{ card.certification.label }}</span
+					>
+					<span
 						v-if="card.blocking"
 						class="status-map-cards__pill"
 						:style="vars(card.blocking.tone)"

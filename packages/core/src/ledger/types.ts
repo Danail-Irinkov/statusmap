@@ -23,6 +23,10 @@ export type Lifecycle =
 // human who looked at the destination state. Machine signals cap at `owning_e2e` (see coverage-signal.ts).
 export type ProofLevel = 'destination' | 'owning_e2e' | 'unit' | 'heuristic' | 'none'
 
+// Connector certification is orthogonal to lifecycle and proof level. It is optional because most
+// product intents are not connector operations.
+export type CoverageTier = 'Green-Read' | 'Green-Write' | 'Amber'
+
 // One concrete test case that exercises an intent/workflow, with its last-known result. Should be a REAL
 // case (the actual `it()` / `test()` name + a real run result, or ingested from a test artifact) — not
 // hand-invented. The deep view lists these failing-first under the intent.
@@ -47,6 +51,7 @@ export type TestNode = {
 export type Coverage = {
 	owningE2e?: string //   the e2e spec that owns this intent
 	matrix?: string //      the harness/QA matrix that covers it
+	tier?: CoverageTier //  provider-readback certification for connector intents
 	proofLevel?: ProofLevel
 	lastRun?: string //     ISO or human date of the last green run
 	passing?: boolean //    last known result

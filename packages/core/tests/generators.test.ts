@@ -1,11 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import {
 	blockingFlag,
+	coverageTierVerdict,
 	intentBlockers,
 	intentToCard,
 	ledgerToArea,
 	ledgerToFeatureDetail,
 	ledgerToOverview,
+	ledgerToQaScan,
 	qaVerdict,
 	testedVerdict,
 	type Ledger,
@@ -25,6 +27,24 @@ describe('testedVerdict — the proof-level ladder', () => {
 
 	it('a heuristic stays weak (yellow) even when passing', () => {
 		expect(testedVerdict({ proofLevel: 'heuristic', passing: true }).tone).toBe('yellow')
+	})
+})
+
+describe('coverageTierVerdict', () => {
+	it('renders connector tiers without changing the proof-level verdict', () => {
+		expect(coverageTierVerdict({ tier: 'Green-Read' })).toEqual({
+			label: 'Green-Read',
+			tone: 'live',
+		})
+		expect(coverageTierVerdict({ tier: 'Green-Write' })).toEqual({
+			label: 'Green-Write',
+			tone: 'live',
+		})
+		expect(coverageTierVerdict({ tier: 'Amber' })).toEqual({
+			label: 'Amber · no reliable readback',
+			tone: 'yellow',
+		})
+		expect(coverageTierVerdict({ proofLevel: 'destination' })).toBeUndefined()
 	})
 })
 
@@ -82,7 +102,7 @@ describe('intentToCard', () => {
 			lifecycle: 'partial',
 			health: 'down',
 			note: 'drops edits',
-			coverage: { proofLevel: 'owning_e2e', passing: false, owningE2e: 'replay' },
+			coverage: { tier: 'Amber', proofLevel: 'owning_e2e', passing: false, owningE2e: 'replay' },
 			workflows: [{ id: 'f', label: 'Flush', lifecycle: 'partial', health: 'down', note: 'too big' }],
 		}
 		const card = intentToCard(i)
@@ -90,6 +110,10 @@ describe('intentToCard', () => {
 		expect(card.blocking!.label).toBe('⚠ Blocked')
 		expect(card.blockers).toEqual(['Flush: too big'])
 		expect(card.coverage!.some((c) => c.label === 'owning_e2e')).toBe(true)
+		expect(card.certification).toEqual({
+			label: 'Amber · no reliable readback',
+			tone: 'yellow',
+		})
 	})
 
 	it('uses file:line run targets for playwright test nodes with steps', () => {
@@ -252,5 +276,42 @@ describe('scope progress badges', () => {
 
 		expect(def.meta.badges?.map((b) => b.label)).toContain('Working now: Partial')
 		expect(def.meta.badges?.map((b) => b.label)).toContain('Scope complete: 58%')
+	})
+})
+
+describe('connector certification tiers', () => {
+	it('keeps the tier visible in the QA scan as well as feature detail', () => {
+		const ledger: Ledger = {
+			areas: [{ id: 'channels', label: 'Channels' }],
+			features: [
+				{
+					id: 'connector',
+					label: 'Connector',
+					areaId: 'channels',
+					lifecycle: 'partial',
+					intents: [
+						{
+							id: 'read',
+							label: 'Read',
+							lifecycle: 'beta',
+							coverage: {
+								tier: 'Green-Read',
+								proofLevel: 'destination',
+								passing: true,
+							},
+						},
+					],
+				},
+			],
+		}
+		const featureCards = ledgerToFeatureDetail(ledger, 'connector')?.sections.find(
+			(section) => section.kind === 'cards',
+		)
+		const qaCards = ledgerToQaScan(ledger).sections.find((section) => section.kind === 'cards')
+
+		expect(featureCards?.kind === 'cards' && featureCards.items[0]?.certification?.label).toBe(
+			'Green-Read',
+		)
+		expect(qaCards?.kind === 'cards' && qaCards.items[0]?.certification?.label).toBe('Green-Read')
 	})
 })
