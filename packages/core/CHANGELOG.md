@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added optional `tags` to ledger nodes and Playwright report suites/specs, tag helpers (`collectLedgerTags`, `intentTags`, `featureTags`), and a `tags` dimension on `filterLedger` and the filter query codec (`?tag=`).
+- `coverage.owningE2e` / `matrix` refs now match globs (`*`, `**`, `{a,b}`) and several space- or comma-separated files, by path suffix, so test trees, run-derived `passing` and tags reach those nodes.
 
 ## 0.1.1 - 2026-07-16
 

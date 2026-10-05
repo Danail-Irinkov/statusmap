@@ -139,20 +139,71 @@ export function parsePlaywrightJson(raw: unknown): RawTestResult[] {
 }
 
 // ── join: which results belong to an intent ──────────────────────────────────────────────────────────
-// A ref is a whitespace token list whose FIRST file-like token must match the result's file; remaining
-// "group" tokens (a matrix group) must each appear in the result's suitePath/name. So
-// `harness-matrix multilingual_robustness` pulls ONLY that group's cases.
+// A ref is a whitespace/comma separated token list. FILE tokens say which spec files it owns; the result
+// matches when ANY file token matches its file. Every remaining "group" token (a matrix group) must appear in
+// the result's suitePath/name, so `harness-matrix multilingual_robustness` pulls ONLY that group's cases.
+//
+// A token is a file token when it has a glob/path character (`*`, `{`, `/`) or ends in a test-file extension.
+// It matches a result file when it equals the file's join key (basename, optional `:line`), or — as a glob
+// (`*` within a directory, `**` any depth incl. none, `{a,b}` alternatives) — matches the END of the file's
+// path on a segment boundary. Refs are relative to a test root the library doesn't know, so
+// `Tabs/Contacts/*.cy.js` matches `cypress/e2e/Company/View/Tabs/Contacts/x.cy.js` but `List/*.cy.js` does
+// not match `.../SubList/x.cy.js`. A ref with only group tokens matches nothing.
+const FILE_EXT = /\.[cm]?[tj]sx?(?::\d+)?$/
+const isFileToken = (t: string) => /[*{/]/.test(t) || FILE_EXT.test(t)
+
+// Glob -> regex source anchored to the end of a '/'-normalized path, starting at a segment boundary.
+function globToRegExp(glob: string): RegExp {
+	let out = ''
+	let depth = 0
+	for (let i = 0; i < glob.length; i++) {
+		const c = glob[i]
+		if (c === '*') {
+			if (glob[i + 1] === '*') {
+				i++
+				if (glob[i + 1] === '/') {
+					i++
+					out += '(?:.*/)?'
+				} else out += '.*'
+			} else out += '[^/]*'
+		} else if (c === '?') out += '[^/]'
+		else if (c === '{') {
+			depth++
+			out += '(?:'
+		} else if (c === '}' && depth > 0) {
+			depth--
+			out += ')'
+		} else if (c === ',' && depth > 0) out += '|'
+		else out += c.replace(/[.+^$()|[\]\\]/g, '\\$&')
+	}
+	out += ')'.repeat(depth)
+	return new RegExp(`(?:^|/)${out}$`)
+}
+
 export function refMatches(ref: string, r: RawTestResult): boolean {
-	const tokens = ref.toLowerCase().split(/\s+/).filter(Boolean)
+	const tokens = ref
+		.toLowerCase()
+		.split(/\s+/)
+		.map((t) => t.replace(/,+$/, ''))
+		.filter(Boolean)
 	if (!tokens.length) return false
 	const fileKey = testJoinKey(r.file)
 	if (!fileKey) return false
-	const fileToken = tokens.find((t) => testJoinKey(t) === fileKey)
-	if (!fileToken) return false
-	const line = Number(fileToken.match(/:(\d+)$/)?.[1])
-	if (Number.isFinite(line) && r.line !== line) return false
+	const path = r.file.toLowerCase().replace(/\\/g, '/')
+	const lineOf = (t: string) => Number(t.match(/:(\d+)$/)?.[1])
+	const lineOk = (t: string) => {
+		const line = lineOf(t)
+		return !Number.isFinite(line) || r.line === line
+	}
+	const exact = tokens.find((t) => testJoinKey(t) === fileKey)
+	const fileMatch = (t: string) => {
+		if (!lineOk(t)) return false
+		if (t === exact) return true
+		return isFileToken(t) && globToRegExp(t.replace(/^\.?\//, '').replace(/:\d+$/, '')).test(path)
+	}
+	if (!tokens.some((t) => (t === exact || isFileToken(t)) && fileMatch(t))) return false
 	const hay = `${r.suitePath.join(' ').toLowerCase()} ${r.name.toLowerCase()}`
-	return tokens.filter((t) => t !== fileToken).every((g) => hay.includes(g))
+	return tokens.filter((t) => t !== exact && !isFileToken(t)).every((g) => hay.includes(g))
 }
 
 export function resultsForIntent(
