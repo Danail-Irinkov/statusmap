@@ -113,6 +113,36 @@
 						</button>
 					</span>
 					<span
+						v-if="allTags.length"
+						class="status-explorer__tags"
+						role="group"
+						aria-label="Filter by tag"
+						data-testid="status-map-tag-filter">
+						<span
+							class="status-explorer__filter-sep"
+							aria-hidden="true"
+							v-if="showNeedsAttention || visibleStatusChips.length || visibleVerdicts.length">·</span>
+						<span class="status-explorer__tags-label">Tags</span>
+						<button
+							v-for="tag in allTags"
+							:key="tag"
+							type="button"
+							class="status-explorer__chip status-explorer__chip--tag"
+							:class="{ 'status-explorer__chip--on': tagActive(tag) }"
+							:aria-pressed="tagActive(tag)"
+							data-testid="status-map-tag-chip"
+							:data-tag="tag"
+							@click="toggleTag(tag)">
+							{{ tag }}
+						</button>
+						<button
+							v-if="selectedTags.length"
+							type="button"
+							class="status-explorer__clear-filter"
+							data-testid="status-map-tag-clear"
+							@click="clearTags">Clear tags</button>
+					</span>
+					<span
 						v-if="filterActive"
 						class="status-explorer__filter-status">
 						{{ filterSummary.shown }} / {{ filterSummary.total }} {{ nounMany }}
@@ -165,6 +195,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
 import {
+	collectLedgerTags,
 	filterLedger,
 	isReviewFilterActive,
 	ledgerToArea,
@@ -174,6 +205,7 @@ import {
 	NEEDS_ATTENTION_TONES,
 	REVIEW_VERDICTS,
 	reviewFilterSummary,
+	normalizeTags,
 	setText,
 	type GeneratorOptions,
 	type Ledger,
@@ -195,6 +227,8 @@ const props = withDefaults(
 		basePath?: string
 		brand?: string
 		featureNoun?: { one: string; many: string }
+		// Tags to preselect (e.g. from `route.query.tag`). Tags the map doesn't carry are ignored.
+		initialTags?: string[]
 	}>(),
 	{
 		area: '',
@@ -203,6 +237,7 @@ const props = withDefaults(
 		basePath: '/status-map',
 		brand: undefined,
 		featureNoun: undefined,
+		initialTags: () => [],
 	},
 )
 
@@ -210,7 +245,12 @@ const link = useStatusMapLink()
 
 // Review filter — local reactive state (status × verdict, AND-combined). It prunes the ledger every view
 // generates from, so overview / area / feature / flat all reflect it.
-const review = ref<ReviewFilter>({ statuses: [], verdicts: [] })
+const allTags = computed(() => collectLedgerTags(props.ledger))
+const review = ref<ReviewFilter>({
+	statuses: [],
+	verdicts: [],
+	tags: normalizeTags(props.initialTags).filter((t) => allTags.value.includes(t)),
+})
 const STATUS_CHIPS: { label: string; tones: StatusTone[] }[] = [
 	{ label: 'Beta-test ready', tones: ['beta'] },
 	{ label: 'Built / partial', tones: ['yellow'] },
@@ -258,6 +298,21 @@ function toggleStatusChip(tones: StatusTone[]) {
 	}
 	review.value = { ...review.value, statuses: [...set] }
 }
+// Tag chips: one per distinct tag in the map (hidden when there are none), multi-select, AND-combined with
+// the tone / verdict / text dimensions by filterLedger.
+const selectedTags = computed(() => review.value.tags ?? [])
+function tagActive(tag: string) {
+	return selectedTags.value.includes(tag)
+}
+function toggleTag(tag: string) {
+	const set = new Set(selectedTags.value)
+	if (set.has(tag)) set.delete(tag)
+	else set.add(tag)
+	review.value = { ...review.value, tags: [...set] }
+}
+function clearTags() {
+	review.value = { ...review.value, tags: [] }
+}
 function toggleVerdict(v: VerdictCategory) {
 	const set = new Set(review.value.verdicts ?? [])
 	if (set.has(v)) set.delete(v)
@@ -273,7 +328,7 @@ function toggleNeedsAttention() {
 function clearReviewFilter() {
 	if (searchTimer) clearTimeout(searchTimer)
 	searchText.value = ''
-	review.value = { statuses: [], verdicts: [] }
+	review.value = { statuses: [], verdicts: [], tags: [] }
 }
 
 // Free-text typeahead (PRD §6.6 `text` dimension). `searchText` is the immediate input model (so typing
@@ -556,6 +611,19 @@ function areaHref(areaId: string) {
 	border-color: var(--statusmap-link, #0f766e);
 	background: var(--statusmap-link, #0f766e);
 	color: var(--statusmap-page, #ffffff);
+}
+
+.status-explorer__tags {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.status-explorer__tags-label {
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--statusmap-muted, #64748b);
 }
 
 .status-explorer__filter-sep {

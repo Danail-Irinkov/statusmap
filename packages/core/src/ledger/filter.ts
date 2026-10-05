@@ -14,6 +14,7 @@ import type { StatusTone } from '../types'
 import type { Ledger, LedgerFeature, UserIntent } from './types'
 import { featureTone, intentHealth, lifecycleTone } from './rollup'
 import { intentBlockers } from './generators'
+import { featureTags, intentTags, mergeTags, normalizeTags } from './tags'
 
 // ── Verdict axis ──────────────────────────────────────────────────────────────────────────────────
 // An intent's verdict categories — it can be several at once (e.g. failing AND blocked). Mirrors the
@@ -57,17 +58,20 @@ export const REVIEW_VERDICTS: VerdictCategory[] = [
 ]
 
 // ── State ───────────────────────────────────────────────────────────────────────────────────────────
-// Four composable dimensions. OR-within (a value matches iff it is one of the selected) and AND-across (a
+// Five composable dimensions. OR-within (a value matches iff it is one of the selected) and AND-across (a
 // node must satisfy every NON-EMPTY dimension). Every dimension empty/absent = inactive = the full map.
 //   • tones    — the legend axis (a node's resolved StatusTone). Because lifecycleTone already projects
 //                lifecycle × health onto a tone, this subsumes a separate lifecycle/health facet.
 //   • verdicts — the orthogonal proof/test/blocking axis (a `live`-tone intent can still be `untested`).
 //   • areas    — structural: feature.areaId ∈ areas.
+//   • tags     — a node's effective tag set (own ∪ matched test-run tags ∪ descendants', see ./tags) has any
+//                of the selected tags. Selecting 'sanity' + the green tone = "what passed in sanity".
 //   • text     — case-insensitive substring over a node's label + summary/note/workflow labels.
 export type StatusMapFilterState = {
 	tones?: StatusTone[]
 	verdicts?: VerdictCategory[]
 	areas?: string[]
+	tags?: string[]
 	text?: string
 	/**
 	 * @deprecated Legacy `ReviewFilter` key for the tone axis — kept so pre-D-006 callers (and the Vue
@@ -83,7 +87,7 @@ function resolveTones(state: StatusMapFilterState): StatusTone[] {
 }
 
 // The four dimension keys, in a stable order — the single source of truth the store + URL codec reuse.
-export const FILTER_DIMENSIONS = ['tones', 'verdicts', 'areas', 'text'] as const
+export const FILTER_DIMENSIONS = ['tones', 'verdicts', 'areas', 'tags', 'text'] as const
 export type FilterDimension = (typeof FILTER_DIMENSIONS)[number]
 
 // Active iff at least one dimension is non-empty (a blank `text` does not count).
@@ -92,6 +96,7 @@ export function isFilterActive(state: StatusMapFilterState): boolean {
 		resolveTones(state).length ||
 		state.verdicts?.length ||
 		state.areas?.length ||
+		state.tags?.length ||
 		state.text?.trim()
 	)
 }
@@ -131,16 +136,24 @@ export function filterLedger(ledger: Ledger, state: StatusMapFilterState): Ledge
 	const tones = resolveTones(state)
 	const verdicts = state.verdicts ?? []
 	const areas = state.areas ?? []
+	const wantedTags = normalizeTags(state.tags)
 	const query = (state.text ?? '').trim().toLowerCase()
 
 	const toneMatch = (tone: StatusTone) => !tones.length || tones.includes(tone)
 	const verdictMatch = (cats: VerdictCategory[]) =>
 		!verdicts.length || cats.some((c) => verdicts.includes(c))
 	const areaMatch = (areaId: string) => !areas.length || areas.includes(areaId)
+	const tagMatch = (tags: string[]) => !wantedTags.length || tags.some((t) => wantedTags.includes(t))
 
-	const intentVisible = (i: UserIntent) =>
+	// A tag authored on an area or feature is meant for everything under it, so a leaf also matches on the
+	// tags its ancestors carry. (Ancestors never gain tags from siblings — only from their own authoring.)
+	const areaOwn = new Map(ledger.areas.map((a) => [a.id, normalizeTags(a.tags)]))
+	const inherited = (f: LedgerFeature) => mergeTags(areaOwn.get(f.areaId), f.tags)
+
+	const intentVisible = (i: UserIntent, f: LedgerFeature) =>
 		toneMatch(lifecycleTone(i.lifecycle, i.health)) &&
 		verdictMatch(intentVerdictCategories(i)) &&
+		tagMatch(mergeTags(inherited(f), intentTags(i))) &&
 		(!query || intentText(i).includes(query))
 
 	const keepFeature = (f: LedgerFeature): LedgerFeature | null => {
@@ -151,14 +164,14 @@ export function filterLedger(ledger: Ledger, state: StatusMapFilterState): Ledge
 			// Text matches against the WHOLE feature (label/summary/any intent); if it matches the feature
 			// shell but no single intent, keep the feature with all its intents — otherwise prune to the
 			// intents that survive every dimension.
-			const matchedIntents = f.intents.filter(intentVisible)
+			const matchedIntents = f.intents.filter((i) => intentVisible(i, f))
 			if (matchedIntents.length) {
 				return { ...f, intents: matchedIntents }
 			}
 			// No intent survives. The feature can still qualify on text alone (e.g. the query hit the summary)
 			// — but only when no leaf-level dimension (tone/verdict) is narrowing, since those are decided at
 			// the intent and produced no match.
-			if (query && !tones.length && !verdicts.length && featureText(f).includes(query)) {
+			if (query && !tones.length && !verdicts.length && !wantedTags.length && featureText(f).includes(query)) {
 				return f
 			}
 			return null
@@ -166,7 +179,10 @@ export function filterLedger(ledger: Ledger, state: StatusMapFilterState): Ledge
 		// A feature with no intents is a leaf matched by its own tone + text; a verdict filter (intent-level)
 		// excludes it.
 		const leafOk =
-			toneMatch(featureTone(f)) && !verdicts.length && (!query || featureText(f).includes(query))
+			toneMatch(featureTone(f)) &&
+			!verdicts.length &&
+			tagMatch(mergeTags(inherited(f), featureTags(f))) &&
+			(!query || featureText(f).includes(query))
 		return leafOk ? f : null
 	}
 

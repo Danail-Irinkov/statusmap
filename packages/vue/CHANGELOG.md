@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added a tag filter to the explorer (chips, multi-select, clear) and an `initialTags` prop on `StatusMap` / `StatusMapExplorer`.
+
 ## 0.1.1 - 2026-07-16
 
 - Added real overview, failing-proof, and mobile dark-mode screenshots to the npm README.

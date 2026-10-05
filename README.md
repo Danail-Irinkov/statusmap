@@ -97,6 +97,29 @@ The renderer is responsive and includes dark-mode tokens:
 
 ![Statusmap mobile overview in dark mode](./docs/images/statusmap-mobile-dark.png)
 
+## Filter by tag
+
+Add `tags` to an area, feature, intent or workflow and the explorer shows one chip per distinct tag next to the
+status filters (hidden when nothing is tagged). Chips are multi-select, combine with the status chips and the
+search box, and keep the ancestors of every match visible.
+
+```yaml
+intents:
+  - id: browse
+    label: Browse the list
+    tags: [sanity]
+```
+
+Test reports can tag too. Give a suite or a spec in the report you pass as `playwright-json` an optional
+`tags: string[]` (Playwright already writes them on specs). A suite's tags apply to every spec beneath it, and
+they merge into whichever intent or workflow owns that spec through `coverage.owningE2e`. A node's tags are its
+own, plus those of its matched specs and its descendants. A tag set on an area or feature also matches
+everything beneath it. A leading `@` is ignored, so `@sanity` and `sanity` are one tag.
+
+To tag from code, set `tags` on the parsed ledger objects before passing `:ledger`. Pass
+`:initial-tags="['sanity']"` to preselect tags, for example from `?tag=`. The core filter takes the same
+selection as `filterLedger(ledger, { tags: ['sanity'] })`.
+
 ## Why it's different
 
 Most status boards let you self-report green. This one is opinionated:

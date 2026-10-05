@@ -6,7 +6,8 @@
 		:view="view"
 		base-path=""
 		:brand="brand"
-		:feature-noun="featureNoun" />
+		:feature-noun="featureNoun"
+		:initial-tags="initialTags" />
 </template>
 
 <script setup lang="ts">
@@ -51,6 +52,8 @@ const props = defineProps<{
 	runner?: StatusMapRunnerOptions
 	// L2-tier noun override (default 'feature'/'features'); pass { one: 'module', many: 'modules' } for ERP vocab.
 	featureNoun?: { one: string; many: string }
+	// Tags to preselect in the tag filter (e.g. `[route.query.tag]`); tags the map doesn't carry are ignored.
+	initialTags?: string[]
 }>()
 
 // Internal drill state (uncontrolled — the whole point of the drop-in).

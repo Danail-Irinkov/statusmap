@@ -110,6 +110,7 @@ export type Workflow = {
 	lifecycle: Lifecycle
 	health?: Health //  override; else derived from lifecycle
 	note?: string
+	tags?: string[] //  free-form labels the tag filter groups by (e.g. 'sanity'); test-run tags are merged in
 	coverage?: Coverage
 }
 
@@ -120,6 +121,7 @@ export type UserIntent = {
 	health?: Health
 	note?: string
 	lane?: string //    a join key the live coverage overlay matches signals on
+	tags?: string[] //  free-form labels the tag filter groups by; test-run tags are merged in
 	workflows?: Workflow[]
 	coverage?: Coverage
 }
@@ -137,6 +139,7 @@ export type LedgerFeature = {
 	coveredChildIds?: string[] // network edge: feature ids this one wraps/covers (wrappers, spines)
 	gaps?: string[] //          documented unknowns to confirm
 	progress?: ScopeProgressMetadata // PRD/spec scope-completion scoring, separate from working-now health
+	tags?: string[] //          free-form labels the tag filter groups by
 }
 
 export type LedgerArea = {
@@ -144,6 +147,7 @@ export type LedgerArea = {
 	label: string
 	summary?: string
 	order?: number
+	tags?: string[] //          free-form labels the tag filter groups by
 }
 
 export type Ledger = {

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added optional `tags` to ledger nodes and Playwright report suites/specs, tag helpers (`collectLedgerTags`, `intentTags`, `featureTags`), and a `tags` dimension on `filterLedger` and the filter query codec (`?tag=`).
+
 ## 0.1.1 - 2026-07-16
 
 - Added rendered Statusmap examples and a copy-ready starter ledger that validates at 0% health.

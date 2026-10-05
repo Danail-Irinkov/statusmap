@@ -4,7 +4,8 @@
 // with a roll-up. Pure functions only: read the artifacts yourself and call these. With no artifact, an
 // intent keeps its hand-authored `coverage.tests` (static fallback).
 
-import type { Coverage, Ledger, TestNode, TestStatus } from './types'
+import { mergeTags } from './tags'
+import type { Coverage, Ledger, TestNode, TestStatus, UserIntent, Workflow } from './types'
 
 export type RawStep = { name: string; status: TestStatus; steps?: RawStep[] }
 export type RawTestResult = {
@@ -14,6 +15,7 @@ export type RawTestResult = {
 	suitePath: string[] //  the describe / suite chain above the test (the "stages")
 	status: TestStatus
 	steps?: RawStep[] //     e2e test.step() sub-steps (the last mile); unit tests have none
+	tags?: string[] //       the spec's own tags plus those of every enclosing suite; absent when untagged
 }
 
 // Normalize a file path OR an owningE2e/spec token to a comparable join key.
@@ -72,8 +74,8 @@ export function parseVitestJson(raw: unknown): RawTestResult[] {
 type PwStepRaw = { title?: string; error?: unknown; steps?: PwStepRaw[]; duration?: number }
 type PwResult = { status?: string; steps?: PwStepRaw[] }
 type PwTest = { results?: PwResult[]; status?: string }
-type PwSpec = { title?: string; line?: number; ok?: boolean; tests?: PwTest[] }
-type PwSuite = { title?: string; file?: string; specs?: PwSpec[]; suites?: PwSuite[] }
+type PwSpec = { title?: string; line?: number; ok?: boolean; tags?: string[]; tests?: PwTest[] }
+type PwSuite = { title?: string; file?: string; tags?: string[]; specs?: PwSpec[]; suites?: PwSuite[] }
 
 function worstStatus(statuses: TestStatus[]): TestStatus {
 	if (statuses.some((s) => s === 'failed')) return 'failed'
@@ -98,13 +100,16 @@ function pwStep(s: PwStepRaw): RawStep {
 	return { name: s.title || '(step)', status, ...(children.length ? { steps: children } : {}) }
 }
 
-// Playwright JSON: nested { suites: [{ title, file, specs: [{ title, tests:[{results:[{status,steps}]}] }], suites }] }.
+// Playwright JSON: nested { suites: [{ title, file, tags?, specs: [{ title, tags?, tests:[{results:[{status,steps}]}] }], suites }] }.
+// `tags` (optional) on a suite applies to every spec beneath it; on a spec, to that spec. Playwright's own
+// reports already put `tags` (e.g. ['@smoke']) on specs.
 export function parsePlaywrightJson(raw: unknown): RawTestResult[] {
 	const report = (raw || {}) as { suites?: PwSuite[] }
 	const out: RawTestResult[] = []
-	const walk = (s: PwSuite, file: string | undefined, path: string[]) => {
+	const walk = (s: PwSuite, file: string | undefined, path: string[], inherited: string[]) => {
 		const f = s.file || file
 		const here = s.title ? [...path, s.title] : path
+		const suiteTags = mergeTags(inherited, s.tags)
 		for (const spec of s.specs || []) {
 			const statuses: TestStatus[] = []
 			let steps: RawStep[] | undefined
@@ -116,6 +121,7 @@ export function parsePlaywrightJson(raw: unknown): RawTestResult[] {
 				}
 			}
 			const status = statuses.length ? worstStatus(statuses) : spec.ok === false ? 'failed' : 'passed'
+			const tags = mergeTags(suiteTags, spec.tags)
 			out.push({
 				name: spec.title || '(spec)',
 				file: f || '',
@@ -123,11 +129,12 @@ export function parsePlaywrightJson(raw: unknown): RawTestResult[] {
 				suitePath: here,
 				status,
 				...(steps ? { steps } : {}),
+				...(tags.length ? { tags } : {}),
 			})
 		}
-		for (const child of s.suites || []) walk(child, f, here)
+		for (const child of s.suites || []) walk(child, f, here, suiteTags)
 	}
-	for (const s of report.suites || []) walk(s, undefined, [])
+	for (const s of report.suites || []) walk(s, undefined, [], [])
 	return out
 }
 
@@ -244,7 +251,10 @@ export function buildTestResults(inputs: {
 	for (const r of all) {
 		const k = `${testJoinKey(r.file)}::${r.suitePath.join('>')}::${r.name}`
 		const prev = byKey.get(k)
-		if (!prev || rank(r.status) < rank(prev.status)) byKey.set(k, r)
+		const winner = !prev || rank(r.status) < rank(prev.status) ? r : prev
+		// A repeated result keeps the union of both runs' tags so de-duping never drops a tag.
+		const tags = mergeTags(prev?.tags, r.tags)
+		byKey.set(k, tags.length ? { ...winner, tags } : winner)
 	}
 	return [...byKey.values()]
 }
@@ -263,11 +273,26 @@ export function applyCoverageTests(ledger: Ledger, results: RawTestResult[]): Le
 		const passing = c.failed > 0 ? false : c.passed > 0 ? true : cov.passing
 		return { ...cov, testTree: tree, passing }
 	}
+	// Tags ride along with the same match: every result that joins a node contributes its tags to that node.
+	// Nodes with no tagged match are returned untouched (no empty `tags` key appears).
+	const withTags = <T extends UserIntent | Workflow>(node: T): T => {
+		const cov = node.coverage
+		if (!cov) return node
+		const matched = mergeTags(...resultsForIntent(results, [cov.owningE2e, cov.matrix]).map((r) => r.tags))
+		return matched.length ? { ...node, tags: mergeTags(node.tags, matched) } : node
+	}
 	return {
 		...ledger,
 		features: ledger.features.map((f) => ({
 			...f,
-			intents: f.intents?.map((i) => ({ ...i, coverage: overlay(i.coverage) })),
+			intents: f.intents?.map((i) => {
+				const tagged = withTags(i)
+				return {
+					...tagged,
+					coverage: overlay(i.coverage),
+					...(tagged.workflows ? { workflows: tagged.workflows.map(withTags) } : {}),
+				}
+			}),
 		})),
 	}
 }

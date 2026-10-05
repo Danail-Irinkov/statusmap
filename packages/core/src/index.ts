@@ -17,6 +17,7 @@ export * from './ledger/generators'
 export * from './ledger/schema'
 export * from './ledger/coverage-signal'
 export * from './ledger/coverage-tests-ingest'
+export * from './ledger/tags'
 
 // The unified, framework-neutral filter (PRD §6.6 / D-006): one state shape + one predicate + a pure store +
 // a URL codec, owned by core so every renderer shares one implementation.

@@ -10,9 +10,9 @@
 import type { StatusTone } from '../types'
 import type { StatusMapFilterState, VerdictCategory } from './filter'
 
-// The three array-valued dimensions a value can be toggled within (the legend tones, the verdict chips, the
-// area facet). `text` is handled by setText, not toggleValue.
-export type FilterGroup = 'tones' | 'verdicts' | 'areas'
+// The array-valued dimensions a value can be toggled within (the legend tones, the verdict chips, the area
+// facet, the tag chips). `text` is handled by setText, not toggleValue.
+export type FilterGroup = 'tones' | 'verdicts' | 'areas' | 'tags'
 
 // A value that can live in one of the array dimensions. Typed loosely (string) because each group's element
 // type differs (StatusTone vs VerdictCategory vs areaId); callers pass the right value for the group.
@@ -97,6 +97,7 @@ export function activeCount(state: StatusMapFilterState): number {
 		(state.tones?.length ?? state.statuses?.length ?? 0) +
 		(state.verdicts?.length ?? 0) +
 		(state.areas?.length ?? 0) +
+		(state.tags?.length ?? 0) +
 		(state.text?.trim() ? 1 : 0)
 	)
 }
@@ -106,15 +107,20 @@ export function activeCount(state: StatusMapFilterState): number {
 // (that would be a duplicate export). `isFilterActive` is referenced internally to keep one definition.
 
 // ── URL codec ────────────────────────────────────────────────────────────────────────────────────────
-// Keys: tones= / verdicts= / areas= (comma-joined), q= (free text). Only non-empty dimensions are written,
+// Keys: tones= / verdicts= / areas= / tag= (comma-joined), q= (free text). Only non-empty dimensions are written,
 // so a clear filter yields no params and `filterToQuery ∘ filterFromQuery` round-trips to the same canonical
 // state. The renderers merge these into the explorer's existing view/area/feature query.
-const QUERY_KEYS: Record<FilterGroup, string> = { tones: 'tones', verdicts: 'verdicts', areas: 'areas' }
+const QUERY_KEYS: Record<FilterGroup, string> = {
+	tones: 'tones',
+	verdicts: 'verdicts',
+	areas: 'areas',
+	tags: 'tag',
+}
 const TEXT_KEY = 'q'
 
 export function filterToQuery(state: StatusMapFilterState): URLSearchParams {
 	const params = new URLSearchParams()
-	for (const group of ['tones', 'verdicts', 'areas'] as FilterGroup[]) {
+	for (const group of ['tones', 'verdicts', 'areas', 'tags'] as FilterGroup[]) {
 		const values = (state[group] as FilterValue[] | undefined) ?? []
 		if (values.length) {
 			params.set(QUERY_KEYS[group], values.join(','))
@@ -147,10 +153,12 @@ export function filterFromQuery(
 	const tones = splitList(get(QUERY_KEYS.tones)) as StatusTone[]
 	const verdicts = splitList(get(QUERY_KEYS.verdicts)) as VerdictCategory[]
 	const areas = splitList(get(QUERY_KEYS.areas))
+	const tags = splitList(get(QUERY_KEYS.tags))
 	const text = get(TEXT_KEY)?.trim()
 	if (tones.length) state.tones = dedupe(tones)
 	if (verdicts.length) state.verdicts = dedupe(verdicts)
 	if (areas.length) state.areas = dedupe(areas)
+	if (tags.length) state.tags = dedupe(tags)
 	if (text) state.text = text
 	return state
 }

@@ -7,6 +7,8 @@ are cut from this public repository.
 
 ## Unreleased
 
+- Added a tag filter: `tags` on areas, features, intents and workflows, and on test-report suites and specs, drive a multi-select chip filter that composes with the status and search filters.
+
 ## 0.1.1 - 2026-07-16
 
 - Added real overview, feature-proof, and mobile dark-mode screenshots to the repository and npm package pages.

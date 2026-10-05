@@ -80,6 +80,17 @@ function validateCoverage(c: Coverage | undefined, where: string, errs: string[]
 	}
 }
 
+// `tags` is optional; when present it must be a list of non-blank strings (a bare `tags: sanity` scalar is the
+// common YAML slip).
+function validateTags(tags: unknown, where: string, errs: string[]) {
+	if (tags === undefined) {
+		return
+	}
+	if (!Array.isArray(tags) || tags.some((t) => typeof t !== 'string' || !t.trim())) {
+		errs.push(`${where}: tags must be an array of non-empty strings`)
+	}
+}
+
 const isLifecycle = (v: unknown): v is Lifecycle =>
 	typeof v === 'string' && (LIFECYCLES as string[]).includes(v)
 const isHealth = (v: unknown): v is Health =>
@@ -145,6 +156,7 @@ function validateWorkflow(w: Workflow, where: string, errs: string[]) {
 	if (!isLifecycle(w.lifecycle)) errs.push(`${where}/${w.id}: bad workflow lifecycle "${w.lifecycle}"`)
 	if (w.health !== undefined && !isHealth(w.health))
 		errs.push(`${where}/${w.id}: bad workflow health "${w.health}"`)
+	validateTags(w.tags, `${where}/${w.id}`, errs)
 	validateCoverage(w.coverage, `${where}/${w.id}`, errs)
 }
 
@@ -156,6 +168,7 @@ function validateIntent(i: UserIntent, where: string, errs: string[]) {
 		errs.push(`${where}/${i.id}: bad intent health "${i.health}"`)
 	if (i.lane !== undefined && !nonEmpty(i.lane))
 		errs.push(`${where}/${i.id}: intent lane must be a non-empty string`)
+	validateTags(i.tags, `${where}/${i.id}`, errs)
 	validateCoverage(i.coverage, `${where}/${i.id}`, errs)
 	for (const w of i.workflows || []) validateWorkflow(w, `${where}/${i.id}`, errs)
 }
@@ -168,6 +181,7 @@ function validateFeature(f: LedgerFeature, areaIds: Set<string>, errs: string[])
 	else if (!areaIds.has(f.areaId)) errs.push(`${where}: areaId "${f.areaId}" is not a declared area`)
 	if (!isLifecycle(f.lifecycle)) errs.push(`${where}: bad lifecycle "${f.lifecycle}"`)
 	if (f.health !== undefined && !isHealth(f.health)) errs.push(`${where}: bad health "${f.health}"`)
+	validateTags(f.tags, where, errs)
 	validateProgress(f, where, errs)
 	for (const i of f.intents || []) validateIntent(i, where, errs)
 }
@@ -179,6 +193,7 @@ export function validateLedger(ledger: Ledger): string[] {
 	for (const a of ledger.areas) {
 		if (!nonEmpty(a.id)) errs.push('area: missing id')
 		if (!nonEmpty(a.label)) errs.push(`area ${a.id}: missing label`)
+		validateTags(a.tags, `area ${a.id}`, errs)
 		if (areaIds.has(a.id)) errs.push(`area ${a.id}: duplicate id`)
 		areaIds.add(a.id)
 	}
